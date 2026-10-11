@@ -17,4 +17,4 @@
 
 - [x] 3.1 Extend staged Vercel verification with public Tetris tests; verify Node24 clean install/typecheck/alltests/pack and preserve existing 240s probe/rollback.
 - [x] 3.2 Release/deploy on free Vercel with existing secrets; verify tag/package/version/public two-client gameplay and synchronize bot commits.
-- [ ] 3.3 After client publication verify its actual Pages demo and update both README live-demo links; verify documentation checks and scoped commit/push.
+- [x] 3.3 After client publication verify its actual Pages demo and update both README live-demo links; verify documentation checks and scoped commit/push.
