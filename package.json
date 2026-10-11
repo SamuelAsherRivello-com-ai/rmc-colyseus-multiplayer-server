@@ -18,8 +18,9 @@
     "check:typescript-source": "tsx scripts/check-typescript-source.ts",
     "build:probe-handlers": "tsc -p tsconfig.probes-build.json",
     "verify:client-package": "tsx scripts/verify-client-package.ts",
-    "build": "npm run check:typescript-source && npm run typecheck && npm test && npm run build:client && npm run build:probe-handlers",
-    "verify:tools": "tsx scripts/verify-tools.ts"
+    "build": "npm run check:typescript-source && npm run typecheck && npm run test:local && npm run build:client && npm run build:probe-handlers",
+    "verify:tools": "tsx scripts/verify-tools.ts",
+    "test:local": "tsx scripts/run-local-tests.ts"
   },
   "dependencies": {
     "@colyseus/core": "0.17.44",

@@ -58,3 +58,5 @@
 ## Required language for all updates
 
 Every contributor, human or AI, MUST keep this repository in strict TypeScript for every change, regardless of scope. This applies to server code, every registered game and simulation, the shared client and rules, tests, probes, release/deployment tools and future additions. Author executable code in .ts/.tsx and keep it in the compiler/source-coverage checks. Do not introduce authored JavaScript, handwritten declaration substitutes or weaker compiler gates. Generated JavaScript/declarations, third-party dependencies and native shell orchestration remain permitted.
+
+Production builds run the full regression suite with `npm run test:local`. This checked runner removes Vercel mode, remote test endpoints, game-only filters and production Blob credentials from its child environment so tests start isolated local servers during Vercel builds. `npm test` retains its existing SERVER_URL contract for explicit public checks. This changes test orchestration only, not deployed runtime environment handling.
