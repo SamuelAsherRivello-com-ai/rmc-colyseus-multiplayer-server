@@ -18,7 +18,7 @@
 | Space Invaders | `space-invaders` | 1–4 | 0.9.12+ | [Live demo](https://samuelasherrivello.github.io/babylon-lite-space-invaders-clone/) | [Protocol](space-invaders.md) · participant-hosted simulation, ordered inputs and checkpoint migration |
 | Street Fighter II Clone | street-fighter-ii | 2 | 0.9.4+ | [In development](https://samuelasherrivello.github.io/babylon-lite-street-fighter-clone/) | [Guide](../packages/client/README.md#coded-private-room-workflow) · [Admission](../src/server.ts#L72) · [Lifecycle](../src/private-code-room.ts#L14) |
 | Sumo Battle | sumo-battle | 12 | 0.2.0+ | [Live demo](https://samuelasherrivello.github.io/babylon-lite-sumo-battle/) | — |
-| Tetris Multiplayer Clone | tetris-duel | 2 | next release | In development | Four-character private rooms; authenticated 15-second cumulative recovery; [Rules/API](tetris-duel.md) |
+| Tetris Multiplayer Clone | tetris-duel | 2 | 0.9.12 | [Play](https://samuelasherrivello.github.io/babylon-lite-tetris-multiplayer-clone/) | Four-character private rooms; authenticated 15-second cumulative recovery; [Rules/API](tetris-duel.md) |
 
 All packages are @rmc/multiplayer-client. Before changing a shared protocol, review each game, update affected consumers and test public URLs. Short downtime and session loss are acceptable; leaving existing demos broken is not.
 

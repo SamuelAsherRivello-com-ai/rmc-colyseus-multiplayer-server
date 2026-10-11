@@ -24,7 +24,7 @@ This repository provides the shared multiplayer service and has no standalone de
 - [**Space Invaders**](https://samuelasherrivello.github.io/babylon-lite-space-invaders-clone/) — Cooperative participant-hosted alien waves for one to four players, with personal lives, spectators and host migration.
 - [**Street Fighter II Clone**](https://samuelasherrivello.github.io/babylon-lite-street-fighter-clone/) — challenge a friend to an authoritative two-player arcade duel. (In development.)
 - [**Sumo Battle**](https://samuelasherrivello.github.io/babylon-lite-sumo-battle/) — push opponents out of the ring in an online sumo arena.
-- **Tetris Multiplayer Clone** — hidden-board timed aim-and-release duel with private opponent hints and garbage attacks. (In development.)
+- [**Tetris Multiplayer Clone**](https://samuelasherrivello.github.io/babylon-lite-tetris-multiplayer-clone/) — hidden-board timed aim-and-release duel with private opponent hints and garbage attacks.
 
 Whenever a new game updates this server, add or update its demo bullet here and its entry in the supported game registry, keeping the demo list in alphabetical order by game name.
 

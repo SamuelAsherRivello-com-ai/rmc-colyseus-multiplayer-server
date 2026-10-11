@@ -6,7 +6,7 @@ Multiplayer games with private rooms should use the same entry flow: show **Play
 
 The server generates and validates codes in [`private-room-codes.ts`](../../src/private-room-codes.ts), admits them through [`server.ts`](../../src/server.ts), and applies recovery in [`private-code-room.ts`](../../src/private-code-room.ts). A room and its code remain available while a player is connected or recovering; after the last player leaves, an empty room remains available for 15 seconds so a refresh can rejoin it with a fresh identity. A server process restart ends rooms. See the matching root README [Custom Shared Features row](../../../README.md#custom-shared-features).
 
-## Tetris Multiplayer Clone (next release)
+## Tetris Multiplayer Clone (0.9.12+)
 
 Use `tetris-duel` for private two-seat play and import browser-safe rules from `@rmc/multiplayer-client/tetris-duel`. This game requires authenticated recovery rather than the generic room-code replacement above. See the [Tetris rules, private projection, input protocol and free Vercel limits](../../documentation/tetris-duel.md).
 
@@ -68,7 +68,7 @@ This package is part of **RMC Colyseus Multiplayer Server**, which has no standa
 - [**Space Invaders**](https://samuelasherrivello.github.io/babylon-lite-space-invaders-clone/) — Cooperative participant-hosted alien waves for one to four players, with personal lives, spectators and host migration.
 - [**Street Fighter II Clone**](https://samuelasherrivello.github.io/babylon-lite-street-fighter-clone/) — private server-authoritative arcade duels with bounded same-seat recovery. (In development.)
 - [**Sumo Battle**](https://samuelasherrivello.github.io/babylon-lite-sumo-battle/) — push opponents out of the ring in an online sumo arena.
-- **Tetris Multiplayer Clone** — hidden-board timed aim-and-release duel with private opponent hints and garbage attacks. (In development.)
+- [**Tetris Multiplayer Clone**](https://samuelasherrivello.github.io/babylon-lite-tetris-multiplayer-clone/) — hidden-board timed aim-and-release duel with private opponent hints and garbage attacks.
 
 See the [server README](../../../README.md) for setup and the [game registry](../../documentation/games.md) for supported consumers.
 
