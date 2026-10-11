@@ -23,6 +23,7 @@ jobs:
           node-version: '24'
           cache: npm
       - run: npm ci
+      - run: npm run check:typescript-source
       - run: npm run typecheck
       - name: Build and deploy a preview without changing production
         id: deploy
@@ -36,5 +37,5 @@ jobs:
         env:
           SERVER_URL: ${{ steps.deploy.outputs.url }}
           LONG_SESSION_SECONDS: ${{ inputs.seconds }}
-        run: node scripts/asteroids-live-session.mjs
+        run: node --import tsx scripts/asteroids-live-session.ts
 

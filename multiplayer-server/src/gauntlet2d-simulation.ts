@@ -1,3 +1,4 @@
+// Seat palette and BFS queue assertions use capacity and loop bounds; coordinate pairs are tuples.
 export const CLASSES = {
   warrior: { speed: 3.5, damage: 28, interval: .48, range: 7, projectile: 8 },
   valkyrie: { speed: 3.9, damage: 21, interval: .36, range: 8, projectile: 10 },
@@ -64,7 +65,7 @@ export class Gauntlet2DSimulation {
   add(id:string) {
     if(this.players.has(id)||this.players.size>=4) return;
     const occupied=new Set([...this.players.values()].map(p=>p.number));let number=1;while(occupied.has(number))number++;
-    this.players.set(id,{id,number,name:'Player '+number,color:COLORS[number-1],hero:'warrior',x:8+number-1,y:26.5,hp:100,cooldown:0,shield:3,revive:0,facing:-Math.PI/2,kills:0,input:emptyInput()});
+    this.players.set(id,{id,number,name:'Player '+number,color:COLORS[number-1]!,hero:'warrior',x:8+number-1,y:26.5,hp:100,cooldown:0,shield:3,revive:0,facing:-Math.PI/2,kills:0,input:emptyInput()});
   }
   remove(id:string){this.players.delete(id);this.shots=this.shots.filter(s=>s.owner!==id);}
   select(id:string,hero:unknown){if(typeof hero==='string'&&Object.hasOwn(CLASSES,hero)){const p=this.players.get(id);if(p)p.hero=hero as Hero;}}
@@ -74,7 +75,7 @@ export class Gauntlet2DSimulation {
     const p=this.players.get(id);if(p)p.input={x:d.x as number,y:d.y as number,ax:d.ax as number,ay:d.ay as number,attack:d.attack,at:this.time};
   }
   move(a:Actor,dx:number,dy:number,ghost=false){
-    const free=(x:number,y:number)=>x>.3&&y>.3&&x<18.7&&y<28.7&&(ghost||[[-.25,-.25],[.25,-.25],[-.25,.25],[.25,.25]].every(([ox,oy])=>!wall(x+ox,y+oy)));
+    const free=(x:number,y:number)=>x>.3&&y>.3&&x<18.7&&y<28.7&&(ghost||([[-.25,-.25],[.25,-.25],[-.25,.25],[.25,.25]] as const).every(([ox,oy])=>!wall(x+ox,y+oy)));
     if(free(a.x+dx,a.y))a.x+=dx;if(free(a.x,a.y+dy))a.y+=dy;
   }
   spawn(g:Generator){if(this.enemies.length>=28)return; this.enemies.push({id:'enemy'+(++this.serial),x:g.x,y:g.y+.6,hp:g.kind==='grunt'?55:30,kind:g.kind,cooldown:1.5,phase:false});}
@@ -89,9 +90,9 @@ export class Gauntlet2DSimulation {
   // Breadth-first grid steering lets enemies navigate authored walls without tunnelling.
   direction(e:Actor,p:Actor){
     if(this.visible(e,p))return {x:p.x-e.x,y:p.y-e.y};
-    const start=[Math.floor(e.x),Math.floor(e.y)],target=Math.floor(p.y)*19+Math.floor(p.x),seen=new Set<number>([start[1]*19+start[0]]);
+    const start: [number,number]=[Math.floor(e.x),Math.floor(e.y)],target=Math.floor(p.y)*19+Math.floor(p.x),seen=new Set<number>([start[1]*19+start[0]]);
     const queue=[{x:start[0],y:start[1],first:null as null|{x:number;y:number}}];
-    for(let i=0;i<queue.length;i++){const n=queue[i];if(n.y*19+n.x===target&&n.first)return {x:n.first.x+.5-e.x,y:n.first.y+.5-e.y};for(const [dx,dy]of [[0,-1],[1,0],[0,1],[-1,0]]){const x=n.x+dx,y=n.y+dy,key=y*19+x;if(wall(x+.5,y+.5)||seen.has(key))continue;seen.add(key);queue.push({x,y,first:n.first||{x,y}});}}
+    for(let i=0;i<queue.length;i++){const n=queue[i]!;if(n.y*19+n.x===target&&n.first)return {x:n.first.x+.5-e.x,y:n.first.y+.5-e.y};for(const [dx,dy]of ([[0,-1],[1,0],[0,1],[-1,0]] as const)){const x=n.x+dx,y=n.y+dy,key=y*19+x;if(wall(x+.5,y+.5)||seen.has(key))continue;seen.add(key);queue.push({x,y,first:n.first||{x,y}});}}
     return {x:0,y:0};
   }
   step(dt:number){

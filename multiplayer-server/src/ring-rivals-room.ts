@@ -1,15 +1,14 @@
 import { CloseCode, type Client } from '@colyseus/core';
 import { PrivateCodeRoom } from './private-code-room.js';
-// @ts-expect-error The simulation is deliberately browser-safe plain JavaScript.
 import { RingRivalsSimulation } from './ring-rivals-simulation.js';
 
 export class RingRivalsRoom extends PrivateCodeRoom {
-  maxClients = 2;
+  override maxClients = 2;
   simulation = new RingRivalsSimulation();
   seats = new Map<string, number>();
   limits = new Map<string, { time: number; count: number }>();
 
-  onCreate(options: { code: string }) {
+  override onCreate(options: { code: string }) {
     this.setMetadata({ code: options.code });
     this.onMessage('input', (client, data) => {
       if (this.accept(client)) this.simulation.input(this.seats.get(client.sessionId), data);
@@ -58,7 +57,7 @@ export class RingRivalsRoom extends PrivateCodeRoom {
     this.broadcast('presence', { players: this.players(), capacity: 2, code: this.metadata?.code });
   }
 
-  onJoin(client: Client, options: { roomCodeRejoinSessionId?: string }) {
+  override onJoin(client: Client, options: { roomCodeRejoinSessionId?: string }) {
     this.privateCodeRoomJoined();
     const replaced = this.consumeRoomCodeRejoin(options?.roomCodeRejoinSessionId);
     const previousSeat = replaced ? this.seats.get(replaced) : undefined;
@@ -78,7 +77,7 @@ export class RingRivalsRoom extends PrivateCodeRoom {
     this.sendSnapshot(client);
   }
 
-  async onDrop(client: Client) {
+  override async onDrop(client: Client) {
     const seat = this.seats.get(client.sessionId);
     if (seat === undefined) return;
     this.simulation.connected(seat, false);
@@ -89,7 +88,7 @@ export class RingRivalsRoom extends PrivateCodeRoom {
     });
   }
 
-  onReconnect(client: Client) {
+  override onReconnect(client: Client) {
     this.privateCodeRoomJoined();
     this.clearRoomCodeRecovery(client.sessionId);
     const seat = this.seats.get(client.sessionId);
@@ -98,7 +97,7 @@ export class RingRivalsRoom extends PrivateCodeRoom {
     this.broadcastState();
   }
 
-  onLeave(client: Client, code?: number) {
+  override onLeave(client: Client, code?: number) {
     if (this.privateCodeRoomLeft(client)) return;
     if (this.isRoomCodeRejoinPending(client.sessionId) || this.hasRoomCodeRecovery(client.sessionId)) return;
     if (code === CloseCode.CONSENTED) { this.removePlayer(client.sessionId); return; }

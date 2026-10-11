@@ -18,9 +18,9 @@ export abstract class PrivateCodeRoom extends Room {
   private readonly offlineSeats = new Map<string, OfflineSeat>();
   private readonly codeReplacements = new Set<string>();
   private readonly replacementTimeouts = new Map<string, ReturnType<typeof setTimeout>>();
-  private emptyRoomTimeout?: ReturnType<typeof setTimeout>;
+  private emptyRoomTimeout: ReturnType<typeof setTimeout> | undefined;
 
-  autoDispose = false;
+  override autoDispose = false;
 
   protected privateCodeRoomJoined(): void {
     clearTimeout(this.emptyRoomTimeout);

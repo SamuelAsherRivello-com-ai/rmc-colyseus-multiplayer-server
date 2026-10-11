@@ -37,7 +37,7 @@ import { VercelAsteroidsStore } from "./asteroids-vercel-store.js";
 import { attachAsteroidsSocket } from "./asteroids-shared-socket.js";
 const asteroidsContinuity = process.env.BLOB_READ_WRITE_TOKEN ? new AsteroidsContinuity(new VercelAsteroidsStore()) : undefined;
 class GameWebSocketTransport extends WebSocketTransport {
-  async onConnection(socket: any, request: any) {
+  override async onConnection(socket: any, request: any) {
     if (request.url?.split("?")[0] === "/asteroids") {
       if (!asteroidsContinuity) { socket.close(1013, "Shared relay unavailable"); return; }
       socket.pingCount = 0; socket.on("pong", () => { socket.pingCount = 0; });
@@ -272,8 +272,8 @@ async function reserve(game: string) {
   return pending;
 }
 class ProbeRoom extends Room {
-  maxClients = 12;
-  onCreate() {
+  override maxClients = 12;
+  override onCreate() {
     this.onMessage("probe", (client: Client, message: unknown) => {
       if (typeof message !== "string" || message.length > 100) return;
       this.broadcast("probe", { nonce: message, sender: client.sessionId, room: this.roomId, instance });

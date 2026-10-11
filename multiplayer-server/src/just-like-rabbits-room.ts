@@ -1,3 +1,4 @@
+// Fallback palette is a nonempty fixed constant.
 import { Room, type Client } from "@colyseus/core";
 import { randomUUID } from "node:crypto";
 import { ParticipantHostRelay, type TransferableState } from "./participant-host-relay.js";
@@ -10,13 +11,13 @@ const first = ["Clover", "Maple", "Juniper", "Robin", "Sage", "Poppy", "Wren", "
 const second = ["Field", "Willow", "Hollow", "Meadow", "Brook", "Thicket", "Vale", "Grove", "Hill", "Dawn", "Burrow", "Moor"];
 
 export class JustLikeRabbitsRoom extends Room {
-  maxClients = 12;
+  override maxClients = 12;
   private readonly players = new Map<string, Player>();
   private readonly relay = new ParticipantHostRelay();
   private readonly limits = new Map<string, { start: number; count: number }>();
   private actionSequence = 0;
 
-  onCreate() {
+  override onCreate() {
     this.onMessage("snapshot", client => this.sendSnapshot(client));
     this.onMessage("heartbeat", client => { if (this.accept(client)) this.syncHost(); });
     this.onMessage("cursor", (client, cursor) => {
@@ -39,12 +40,12 @@ export class JustLikeRabbitsRoom extends Room {
     this.setSimulationInterval(() => this.syncHost(), 1000);
   }
 
-  onJoin(client: Client) {
+  override onJoin(client: Client) {
     const occupied = new Set([...this.players.values()].map(player => player.number));
     let number = 1; while (occupied.has(number)) number++;
     const seed = parseInt(randomUUID().slice(0, 8), 16);
     const used = new Set([...this.players.values()].map(player => player.color));
-    const color = colors.find(entry => !used.has(entry)) ?? colors[0];
+    const color = colors.find(entry => !used.has(entry)) ?? colors[0]!;
     this.players.set(client.sessionId, { id: client.sessionId, number, name: `${first[seed % first.length]} ${second[(seed >>> 5) % second.length]}`, color, cursor: null, host: false });
     const election = this.relay.join(client.sessionId);
     this.syncHost();
@@ -52,7 +53,7 @@ export class JustLikeRabbitsRoom extends Room {
     this.sendSnapshot(client);
   }
 
-  onLeave(client: Client) {
+  override onLeave(client: Client) {
     this.players.delete(client.sessionId); this.limits.delete(client.sessionId);
     const election = this.relay.leave(client.sessionId);
     this.broadcast("departed", client.sessionId);

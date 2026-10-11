@@ -1,0 +1,12 @@
+import fs from 'node:fs';
+const org=process.env.VERCEL_ORG_ID,projectId=process.env.VERCEL_PROJECT_ID;
+if(!org||!projectId||!process.env.VERCEL_TOKEN)throw Error('Existing Vercel credentials are required');
+const api=async (path: string)=>{const response=await fetch('https://api.vercel.com'+path,{headers:{Authorization:'Bearer '+process.env.VERCEL_TOKEN}});if(!response.ok)throw Error('Vercel inspection HTTP '+response.status);return response.json();};
+const record=await api('/v2/teams/'+encodeURIComponent(org)),team=record.team??record;
+if(team.billing?.plan!=='hobby')throw Error('This game requires the free Hobby plan; observed '+String(team.billing?.plan));
+const query='?teamId='+encodeURIComponent(org);
+const project=await api('/v9/projects/'+encodeURIComponent(projectId)+query);
+if(project.id!==projectId)throw Error('Unexpected project identity');
+const list=await api('/v7/deployments'+query+'&projectId='+encodeURIComponent(projectId)+'&limit=3');
+const result={plan:team.billing.plan,project:project.name,deployments:(list.deployments??[]).map((d: {url: string;state: string;createdAt: number})=>({url:d.url,state:d.state,createdAt:d.createdAt}))};
+fs.writeFileSync('hobby-verification.json',JSON.stringify(result,null,2));console.log(JSON.stringify(result));

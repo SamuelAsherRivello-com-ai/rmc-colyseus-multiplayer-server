@@ -173,3 +173,22 @@ Rooms are process-local on the free Vercel Hobby deployment. Participant-host mi
 Combat, Bomberman, Space Invaders, Ring Rivals, Tetris and Music Maker retry transient missing-room lookups and socket attachment within a bounded budget. Socket retries reuse the original reservation and identity; they do not reserve extra seats or create replacement rooms. Full rooms, malformed codes and invalid private tokens remain terminal. Leaving cancels outstanding retries. These retries do not promise cross-instance durability.
 
 Each opted-in socket handshake is bounded to three seconds. A socket that closes before joining rejects promptly; failure, timeout and cancellation close the attempted socket. This covers a gap in the pinned SDK, whose reservation promise otherwise can remain pending after a pre-join close. Retries keep their existing original-seat budget and do not repeat admission.
+
+## Strict TypeScript consumers
+
+Build from the server repository root with `npm run build:client`, then run `npm run verify:client-package` and `npm pack ./multiplayer-server/packages/client`. The tarball contains generated ESM and declarations in `dist/`, README and package metadata. All ten existing public import paths have runtime and `types` mappings. Both Bundler and NodeNext consumers are checked, and compiled JavaScript can load every export without a TypeScript loader. Browser compilation uses DOM libraries without Node globals.
+
+The generic client gives subscriptions the chosen game-state type and constrains messages to the chosen action map. Rule modules also export their simulation/input types. For example:
+
+```ts
+import {MultiplayerClient} from '@rmc/multiplayer-client';
+import {RacingSimulation} from '@rmc/multiplayer-client/racing';
+import type {RacingControl} from '@rmc/multiplayer-client/racing';
+type RacingState = ReturnType<RacingSimulation['snapshot']>;
+const session = new MultiplayerClient<RacingState, {input: RacingControl}>(
+  'http://localhost:2567', 'racing',
+);
+session.subscribe(state => { void state.gameState?.trucks; });
+```
+
+Verify the exact pinned release tarball before installation: source-checkout declarations cannot compensate for a legacy asset without them. Local migration does not publish or replace an existing release. Keep your existing import paths, room admission, reconnection and authority rules.

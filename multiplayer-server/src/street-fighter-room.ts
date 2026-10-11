@@ -1,16 +1,15 @@
 import { CloseCode, type Client } from "@colyseus/core";
 import { PrivateCodeRoom } from "./private-code-room.js";
 // The same browser-safe deterministic rules are exported by the shared client package.
-// @ts-expect-error The package's simulation module is plain JavaScript.
 import { StreetFighterSimulation } from "../packages/client/street-fighter-simulation.js";
 
 export class StreetFighterRoom extends PrivateCodeRoom {
-  maxClients = 2;
+  override maxClients = 2;
   simulation = new StreetFighterSimulation();
   limits = new Map<string, { time: number; count: number }>();
   disconnectedTokens = new Map<string, string>();
 
-  onCreate(options: { code: string }) {
+  override onCreate(options: { code: string }) {
     this.simulation.setStageFromCode(options.code);
     this.setMetadata({ code: options.code });
     this.onMessage("snapshot", (client) => { if (this.accept(client)) client.send("snapshot", { players: this.players(), capacity: 2, gameState: this.simulation.snapshot() }); });
@@ -31,7 +30,7 @@ export class StreetFighterRoom extends PrivateCodeRoom {
   players() { return this.simulation.seats.map((seat: { sessionId: string | null; number: number; fighter: string; connected: boolean }) => ({ id: seat.sessionId, number: seat.number, fighter: seat.fighter, connected: seat.connected })); }
   activeTokens() { return this.simulation.seats.map((seat: { token: string }) => seat.token); }
 
-  onJoin(client: Client, options: { reconnectToken?: string; roomCodeRejoinSessionId?: string }) {
+  override onJoin(client: Client, options: { reconnectToken?: string; roomCodeRejoinSessionId?: string }) {
     this.privateCodeRoomJoined();
     const token = options?.reconnectToken;
     const replaced = this.consumeRoomCodeRejoin(options?.roomCodeRejoinSessionId);
@@ -44,14 +43,14 @@ export class StreetFighterRoom extends PrivateCodeRoom {
     this.broadcast("presence", { players: this.players(), capacity: 2, gameState: this.simulation.snapshot() });
   }
 
-  onReconnect(client: Client) {
+  override onReconnect(client: Client) {
     this.privateCodeRoomJoined();
     this.clearRoomCodeRecovery(client.sessionId);
     this.disconnectedTokens.delete(client.sessionId);
     client.send("snapshot", { players: this.players(), capacity: 2, gameState: this.simulation.snapshot() });
   }
 
-  async onDrop(client: Client) {
+  override async onDrop(client: Client) {
     const token = this.simulation.sessionSeats.get(client.sessionId)?.token;
     if (token) this.disconnectedTokens.set(client.sessionId, token);
     this.simulation.disconnect(client.sessionId);
@@ -59,7 +58,7 @@ export class StreetFighterRoom extends PrivateCodeRoom {
     await this.waitForCodeRecovery(client, () => { if (this.clients.length === 0) this.removePlayer(client.sessionId); });
   }
 
-  onLeave(client: Client, code?: number) {
+  override onLeave(client: Client, code?: number) {
     if (this.privateCodeRoomLeft(client)) return;
     if (this.isRoomCodeRejoinPending(client.sessionId) || this.hasRoomCodeRecovery(client.sessionId)) return;
     if (code === CloseCode.CONSENTED) { this.removePlayer(client.sessionId); return; }

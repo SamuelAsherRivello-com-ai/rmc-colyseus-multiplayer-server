@@ -4,7 +4,7 @@ import { randomUUID } from "node:crypto";
 type Member = { id: string; number: number; sessionId: string };
 /** Fixed creator authority. Never elect a guest when the creator leaves. */
 export class AsteroidsRoom extends Room {
-  maxClients = 4;
+  override maxClients = 4;
   private creatorToken = "";
   private hostSession = "";
   private members = new Map<string, Member>();
@@ -15,7 +15,7 @@ export class AsteroidsRoom extends Room {
   private serial = 0;
   private ended = false;
 
-  onCreate(options: { code: string; creatorToken: string }) {
+  override onCreate(options: { code: string; creatorToken: string }) {
     this.creatorToken = options.creatorToken;
     this.autoDispose = false;
     this.setMetadata({ code: options.code });
@@ -62,7 +62,7 @@ export class AsteroidsRoom extends Room {
       }
     });
   }
-  onAuth(_client: Client, options: { identityToken?: string }) {
+  override onAuth(_client: Client, options: { identityToken?: string }) {
     if (this.ended) throw new ServerError(410, "Session ended");
     if (
       typeof options.identityToken !== "string" ||
@@ -89,7 +89,7 @@ export class AsteroidsRoom extends Room {
   identityFor(token: string) {
     return this.identities.get(token)!;
   }
-  onJoin(client: Client, _options: unknown, identity: string) {
+  override onJoin(client: Client, _options: unknown, identity: string) {
     if ([...this.members.values()].some((m) => m.id === identity))
       throw new ServerError(409, "Identity already connected");
     const occupied = new Set([...this.members.values()].map((m) => m.number));
@@ -110,7 +110,7 @@ export class AsteroidsRoom extends Room {
     this.broadcast("presence", this.roomPresence());
     if (this.frame) client.send("gameState", this.frame);
   }
-  onLeave(client: Client) {
+  override onLeave(client: Client) {
     this.members.delete(client.sessionId);
     this.budgets.delete(client.sessionId);
     this.serial++;

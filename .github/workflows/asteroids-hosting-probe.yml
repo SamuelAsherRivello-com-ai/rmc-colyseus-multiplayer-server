@@ -16,44 +16,21 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '24'
+      - run: npm ci
+      - run: npm run check:typescript-source
+      - run: npm run typecheck
+      - run: npm run build:probe-handlers
       - name: Build isolated capability probe
         run: |
           mkdir -p .hosting-probe/api
-          node --input-type=module <<'NODE'
-          import fs from 'node:fs';
-          fs.writeFileSync('.hosting-probe/package.json',JSON.stringify({name:'asteroids-hosting-capability-probe',private:true,type:'module',engines:{node:'24.x'},dependencies:{'@vercel/functions':'latest'}}));
-          fs.writeFileSync('.hosting-probe/vercel.json',JSON.stringify({framework:null,regions:['iad1'],functions:{'api/*.mjs':{maxDuration:30}}}));
-          const source=`import { getCache } from '@vercel/functions';
-          import { randomUUID } from 'node:crypto';
-          const instance=randomUUID();
-          export default async function(req,res){
-            if(req.headers['x-probe-secret']!==process.env.PROBE_SECRET){res.statusCode=403;res.end();return;}
-            const key=new URL(req.url,'http://probe').searchParams.get('key')||'';if(!/^[a-f0-9-]{36}$/.test(key)){res.statusCode=400;res.end();return;}
-            const cache=getCache({namespace:'rmc-asteroids-feasibility-v1'}),start=performance.now();
-            res.setHeader('Content-Type','application/json');
-            if(req.method==='POST'){const chunks=[];for await(const chunk of req)chunks.push(chunk);await cache.set(key,JSON.parse(Buffer.concat(chunks).toString()),{ttl:60});res.end(JSON.stringify({instance,writeMs:performance.now()-start}));}
-            else res.end(JSON.stringify({instance,value:await cache.get(key),readMs:performance.now()-start}));
-          }`;
-          for(const name of ['cache-a','cache-b'])fs.writeFileSync('.hosting-probe/api/'+name+'.mjs',source);
-          NODE
+          node --import tsx scripts/workflows/asteroids-hosting-probe-3.ts
           npm install --prefix .hosting-probe --ignore-scripts
           npm install --global vercel@62.2.0
-          node --input-type=module <<'NODE'
-          import fs from 'node:fs';
-          const output='.hosting-probe/.vercel/output';fs.mkdirSync(output,{recursive:true});
-          fs.writeFileSync(output+'/config.json',JSON.stringify({version:3,routes:[{handle:'filesystem'}]}));
-          fs.writeFileSync(output+'/builds.json',JSON.stringify({target:'preview',builds:[]}));
-          for(const name of ['cache-a','cache-b']){
-            const folder=output+'/functions/api/'+name+'.func';fs.mkdirSync(folder,{recursive:true});
-            fs.writeFileSync(folder+'/index.mjs',fs.readFileSync('.hosting-probe/api/'+name+'.mjs','utf8')+'\n// distinct function '+name);
-            fs.cpSync('.hosting-probe/node_modules',folder+'/node_modules',{recursive:true});
-            fs.writeFileSync(folder+'/.vc-config.json',JSON.stringify({runtime:'nodejs24.x',handler:'index.mjs',launcherType:'Nodejs',maxDuration:30,regions:['iad1']}));
-          }
-          NODE
+          node --import tsx scripts/workflows/asteroids-hosting-probe-2.ts
       - name: Stage probe without changing the production alias
         id: deploy
         run: |
-          probe_secret="$(node -e "process.stdout.write(require('crypto').randomBytes(32).toString('hex'))")"
+          probe_secret="$(node --import tsx scripts/create-probe-secret.ts)"
           echo "::add-mask::$probe_secret"
           echo "PROBE_SECRET=$probe_secret" >> "$GITHUB_ENV"
           vercel pull --yes --environment=preview --cwd .hosting-probe --token="$VERCEL_TOKEN"
@@ -63,21 +40,7 @@ jobs:
         env:
           PROBE_URL: ${{ steps.deploy.outputs.url }}
         run: |
-          node --input-type=module <<'NODE'
-          import fs from 'node:fs';import {randomUUID} from 'node:crypto';
-          const headers={'x-probe-secret':process.env.PROBE_SECRET,'Content-Type':'application/json'};
-          const results=[];
-          for(let i=0;i<20;i++){
-            const key=randomUUID(),value={sequence:i,nonce:randomUUID()};
-            const write=await fetch(process.env.PROBE_URL+'/api/cache-a?key='+key,{method:'POST',headers,body:JSON.stringify(value)});
-            const writer=await write.json();if(!write.ok)throw new Error('Cache write failed '+write.status);
-            const read=await fetch(process.env.PROBE_URL+'/api/cache-b?key='+key,{headers});const reader=await read.json();
-            results.push({writer:writer.instance,reader:reader.instance,writeMs:writer.writeMs,readMs:reader.readMs,matched:JSON.stringify(reader.value)===JSON.stringify(value)});
-          }
-          fs.writeFileSync('asteroids-cache-probe.json',JSON.stringify({url:process.env.PROBE_URL,results},null,2));
-          console.log(JSON.stringify(results,null,2));
-          if(results.some(r=>r.writer===r.reader||!r.matched))throw new Error('Fresh independent-function visibility not established');
-          NODE
+          node --import tsx scripts/workflows/asteroids-hosting-probe-1.ts
       - uses: actions/upload-artifact@v4
         if: always()
         with:

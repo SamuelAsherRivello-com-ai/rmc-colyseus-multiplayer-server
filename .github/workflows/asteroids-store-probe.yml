@@ -16,28 +16,21 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '24'
+      - run: npm ci
+      - run: npm run check:typescript-source
+      - run: npm run typecheck
+      - run: npm run build:probe-handlers
       - name: Build independent private-storage probe Functions
         run: |
           mkdir -p .store-probe
           echo '{"private":true,"type":"module","dependencies":{"@vercel/blob":"2.8.1"}}' > .store-probe/package.json
           npm install --prefix .store-probe --ignore-scripts
           npm install --global vercel@62.2.0
-          node --input-type=module <<'NODE'
-          import fs from 'node:fs';
-          const root='.store-probe/.vercel/output';fs.mkdirSync(root,{recursive:true});
-          fs.writeFileSync(root+'/config.json',JSON.stringify({version:3,routes:[{handle:'filesystem'}]}));
-          fs.writeFileSync(root+'/builds.json',JSON.stringify({target:'preview',builds:[]}));
-          for(const name of ['store-a','store-b']) {
-            const folder=root+'/functions/api/'+name+'.func';fs.mkdirSync(folder,{recursive:true});
-            fs.writeFileSync(folder+'/index.mjs',fs.readFileSync('scripts/asteroids-store-probe-handler.mjs','utf8')+'\n//distinct function '+name);
-            fs.cpSync('.store-probe/node_modules',folder+'/node_modules',{recursive:true});
-            fs.writeFileSync(folder+'/.vc-config.json',JSON.stringify({runtime:'nodejs24.x',handler:'index.mjs',launcherType:'Nodejs',maxDuration:30,regions:['iad1']}));
-          }
-          NODE
+          node --import tsx scripts/workflows/asteroids-store-probe-2.ts
       - name: Deploy preview without changing production
         id: deploy
         run: |
-          probe_secret="$(node -e "process.stdout.write(require('crypto').randomBytes(32).toString('hex'))")"
+          probe_secret="$(node --import tsx scripts/create-probe-secret.ts)"
           echo "::add-mask::$probe_secret"
           echo "PROBE_SECRET=$probe_secret" >> "$GITHUB_ENV"
           vercel pull --yes --environment=preview --cwd .store-probe --token="$VERCEL_TOKEN"
@@ -47,22 +40,4 @@ jobs:
         env:
           PROBE_URL: ${{ steps.deploy.outputs.url }}
         run: |
-          node --input-type=module <<'NODE'
-          import assert from 'node:assert/strict';import {randomUUID} from 'node:crypto';
-          const key=randomUUID(),headers={'x-probe-secret':process.env.PROBE_SECRET,'Content-Type':'application/json'};
-          async function call(route,op,body) {
-            const response=await fetch(`${process.env.PROBE_URL}/api/${route}?key=${key}&op=${op}`,{headers,...(body?{method:'POST',body:JSON.stringify(body)}:{})});
-            return {status:response.status,...await response.json()};
-          }
-          const claim=await Promise.all(['store-a','store-b'].map((route,i)=>call(route,'claim',{value:{claim:i,padding:randomUUID().repeat(128)}})));
-          console.log(JSON.stringify({claim}));assert.deepEqual(claim.map(r=>r.status).sort(),[200,409]);assert.notEqual(claim[0].instance,claim[1].instance);
-          const compressed=await call('store-a','read');assert.equal(compressed.status,200);
-          const initial=await call('store-a','read-identity');assert.equal(initial.status,200);
-          console.log(JSON.stringify({defaultReadEncoding:compressed.encoding,defaultEtag:compressed.etag,identityReadEncoding:initial.encoding,identityEtag:initial.etag}));const cas=await Promise.all(['store-a','store-b'].map((route,i)=>call(route,'cas',{etag:initial.etag,value:{winner:i}})));
-          console.log(JSON.stringify({cas}));assert.deepEqual(cas.map(r=>r.status).sort(),[200,409]);
-          const final=await call('store-b','read-identity');assert.equal(final.status,200);assert.notEqual(final.etag,initial.etag);
-          assert.equal(final.value.winner,cas.findIndex(r=>r.status===200));
-          await call('store-a','delete');
-          console.log(JSON.stringify({exclusiveCreation:claim.map(r=>r.status),conditionalWrite:cas.map(r=>r.status),distinctInstances:true,consistentLatestRead:true,defaultReadEncoding:compressed.encoding,defaultEtagWeak:compressed.weak,identityReadEncoding:initial.encoding,identityEtagWeak:initial.weak}));
-          NODE
-
+          node --import tsx scripts/workflows/asteroids-store-probe-1.ts

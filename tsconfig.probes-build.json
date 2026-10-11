@@ -1,0 +1,13 @@
+{
+  "extends": "./tsconfig.tools.json",
+  "compilerOptions": {
+    "noEmit": false,
+    "allowImportingTsExtensions": false,
+    "rootDir": "scripts",
+    "outDir": "dist/probes"
+  },
+  "include": [
+    "scripts/asteroids-store-probe-handler.ts",
+    "scripts/fixtures/cache-probe-handler.ts"
+  ]
+}

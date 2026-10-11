@@ -1,3 +1,4 @@
+// Seat name/color indexes are bounded by the twelve-seat admission limit.
 import { Room, type Client } from "@colyseus/core";
 
 type Gardener = { id: string; number: number; name: string; color: string; x: number; z: number };
@@ -5,13 +6,13 @@ type Chat = { id: number; sender: string; name: string; color: string; text: str
 const colors = ["#ed866e", "#68a8db", "#b99cdb", "#e6ba59", "#6cc5ae", "#de87b0", "#a1b754", "#768bd2", "#da9c61", "#6dbfcd", "#ca737a", "#93aa84"];
 const names = ["Peach", "Bluebell", "Lavender", "Marigold", "Mint", "Clover", "Fern", "Iris", "Maple", "River", "Rose", "Sage"];
 export class GardenRoom extends Room {
-  maxClients = 12;
+  override maxClients = 12;
   players = new Map<string, Gardener>();
   inputs = new Map<string, { x: number; z: number; time: number }>();
   chats: Chat[] = [];
   limits = new Map<string, { time: number; count: number; chat: number }>();
   sequence = 0;
-  onCreate() {
+  override onCreate() {
     this.onMessage("snapshot", client => {
       if (this.accept(client)) client.send("snapshot", { players: [...this.players.values()], chats: this.chats, capacity: this.maxClients });
     });
@@ -51,7 +52,8 @@ export class GardenRoom extends Room {
     }
     for (let pass = 0; pass < 6; pass++) {
       for (let i = 0; i < players.length; i++) for (let j = i + 1; j < players.length; j++) {
-        const a = players[i], b = players[j];
+        // i and j are bounded by the unchanged local player array.
+        const a = players[i]!, b = players[j]!;
         let dx = b.x - a.x, dz = b.z - a.z, distance = Math.hypot(dx, dz);
         if (distance >= 1) continue;
         if (distance < 0.0001) { dx = 1; dz = 0; distance = 1; }
@@ -63,7 +65,7 @@ export class GardenRoom extends Room {
     }
     this.broadcast("garden", { players });
   }
-  onJoin(client: Client) {
+  override onJoin(client: Client) {
     const occupied = new Set([...this.players.values()].map(p => p.number));
     let number = 1; while (occupied.has(number)) number++;
     // Find a free spawn even when returning visitors occupy the original seat location.
@@ -72,10 +74,10 @@ export class GardenRoom extends Room {
       x = -5 + col * 2; z = -7 + row * 2;
       if ([...this.players.values()].every(p => Math.hypot(p.x - x, p.z - z) >= 1.2)) break outer;
     }
-    this.players.set(client.sessionId, { id: client.sessionId, number, name: names[number - 1], color: colors[number - 1], x, z });
+    this.players.set(client.sessionId, { id: client.sessionId, number, name: names[number - 1]!, color: colors[number - 1]!, x, z });
     this.broadcast("presence", { players: [...this.players.values()], capacity: this.maxClients });
   }
-  onLeave(client: Client) {
+  override onLeave(client: Client) {
     this.players.delete(client.sessionId); this.inputs.delete(client.sessionId); this.limits.delete(client.sessionId);
     this.broadcast("departed", client.sessionId);
     this.broadcast("presence", { players: [...this.players.values()], capacity: this.maxClients });

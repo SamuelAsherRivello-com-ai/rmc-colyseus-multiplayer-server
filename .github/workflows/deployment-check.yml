@@ -19,10 +19,11 @@ jobs:
         with:
           node-version: '24'
           cache: npm
-      - name: Verify Render configuration and health
-        run: node scripts/check-credentials.mjs
       - run: npm ci
+      - run: npm run check:typescript-source
       - run: npm run typecheck
+      - name: Verify Render configuration and health
+        run: node --import tsx scripts/check-credentials.ts
       - name: Two-client public admission check
         run: npm run probe
         env:

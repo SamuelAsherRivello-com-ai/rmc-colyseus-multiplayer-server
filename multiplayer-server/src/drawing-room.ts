@@ -1,3 +1,4 @@
+// Palette lookup is bounded by the room capacity and available-color count.
 import { Room, type Client } from "@colyseus/core";
 import { randomUUID } from "node:crypto";
 
@@ -8,11 +9,11 @@ const colors = ["#d64d68", "#3478c8", "#38956a", "#9365c6", "#d57930", "#228d99"
 const adjectives = ["Cosmic", "Sunny", "Quiet", "Clever", "Velvet", "Mellow", "Brave", "Silver"];
 const animals = ["Otter", "Panda", "Finch", "Fox", "Lynx", "Moth", "Kiwi", "Orca"];
 export class DrawingRoom extends Room {
-  maxClients = 12;
+  override maxClients = 12;
   players = new Map<string, Player>();
   strokes = new Map<string, Stroke>();
   limits = new Map<string, { time: number; count: number }>();
-  onCreate() {
+  override onCreate() {
     this.onMessage("snapshot", client => this.snapshot(client));
     this.onMessage("cursor", (client, point) => {
       if (!this.accept(client) || !(point === null || validPoint(point))) return;
@@ -57,14 +58,14 @@ export class DrawingRoom extends Room {
     if (!limit || now - limit.time > 1000) { limit = { time: now, count: 0 }; this.limits.set(client.sessionId, limit); }
     return ++limit.count <= 100;
   }
-  onJoin(client: Client) {
+  override onJoin(client: Client) {
     const occupied = new Set([...this.players.values()].map(p => p.number));
     let number = 1;
     while (occupied.has(number)) number++;
     const seed = parseInt(randomUUID().slice(0, 8), 16);
     const usedColors = new Set([...this.players.values()].map(p => p.color));
     const available = colors.filter(c => !usedColors.has(c));
-    const player = { id: client.sessionId, number, name: adjectives[seed % adjectives.length] + " " + animals[(seed >>> 4) % animals.length], color: available[seed % available.length], cursor: null };
+    const player = { id: client.sessionId, number, name: adjectives[seed % adjectives.length] + " " + animals[(seed >>> 4) % animals.length], color: available[seed % available.length]!, cursor: null };
     this.players.set(client.sessionId, player);
     this.broadcast("presence", { players: [...this.players.values()], capacity: this.maxClients });
   }
@@ -72,7 +73,7 @@ export class DrawingRoom extends Room {
     if (!this.accept(client)) return;
     client.send("snapshot", { players: [...this.players.values()], strokes: [...this.strokes.values()], capacity: this.maxClients });
   }
-  onLeave(client: Client) {
+  override onLeave(client: Client) {
     this.players.delete(client.sessionId);
     this.limits.delete(client.sessionId);
     for (const [id, stroke] of this.strokes) if (stroke.owner === client.sessionId) this.strokes.delete(id);

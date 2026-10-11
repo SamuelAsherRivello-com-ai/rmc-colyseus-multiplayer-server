@@ -47,6 +47,7 @@ Use Node 24 and npm:
 
 ```sh
 npm ci
+npm run check:typescript-source
 npm run check:docs
 npm run typecheck
 npm test
@@ -118,6 +119,7 @@ New games should review this catalog and [the game registry](multiplayer-server/
 ### Shared Client API
 
 See [package documentation](multiplayer-server/packages/client/README.md). Build locally with
+`npm run build:client`, then
 `npm pack ./multiplayer-server/packages/client --pack-destination artifacts` after creating the artifacts directory.
 
 After release, install the exact asset URL:
@@ -180,3 +182,21 @@ Deployment explicitly assigns the canonical public alias after a tagged checkout
 ## Enter the Gungeon Clone
 
 [Live demo](https://samuelasherrivello.github.io/babylon-lite-enter-the-gungeon-clone/) — [Source](https://github.com/SamuelAsherRivello/babylon-lite-enter-the-gungeon-clone). `gungeon` adds private four-character rooms for 1–4 players, readiness, authoritative arena movement/combat, dodge invulnerability, three weapon patterns, shared upgrade rewards, revival and wave/boss progression. Existing shared-client callers remain compatible; optional admission options support create/join. Two-client integration and deterministic rule tests are included in local and live deployment checks. Fresh reconnect and in-memory hosting limits above apply.
+
+## Strict TypeScript development
+
+Node 24, TypeScript 5.9.3 and tsx 4.22.4 are the supported toolchain. All first-party server, browser client, rules, tests and executable tooling are TypeScript. `tsx` runs source; compilation checks are separate and mandatory.
+
+`tsconfig.base.json` enables strict checking, `noUncheckedIndexedAccess`, `exactOptionalPropertyTypes`, `noImplicitOverride`, `verbatimModuleSyntax` and consistent casing. The server uses `tsconfig.json` (NodeNext), browser modules use `tsconfig.client.json` (Bundler, DOM, no Node globals), and tests/scripts use `tsconfig.tools.json` (NodeNext). `tsconfig.client-build.json` emits ESM and declarations; `tsconfig.probes-build.json` emits the generated hosting fixture handlers.
+
+Run `npm ci`, `npm run check:typescript-source`, `npm run check:docs`, `npm run typecheck`, `npm test`, `npm run build:client`, `npm run build:probe-handlers`, `npm run verify:tools`, and `npm run verify:client-package`. Set `VERIFY_LOCAL_SERVER=1` for the optional packed-client local authority/recovery tests and short local probes. `npm run build` includes coverage, compilers, tests and both emit steps. Source coverage examines tracked and nonignored untracked files, rejecting authored JavaScript and TypeScript outside compiler ownership. Dependency, coverage, test-report and generated `dist` trees are excluded; first-party tests/probes are checked.
+
+CLI tools now use `.ts` paths: run `node --import tsx scripts/<name>.ts` or the documented npm script. Workflow bodies live in `scripts/workflows/`; generated `.mjs` handlers come from checked TypeScript fixture sources. Credential and deployment tools retain their existing environment variable contracts. Version-setting writes both package manifests; it requires an explicit `VERSION`.
+
+Build the client in every fresh packaging job before `npm pack`. Its existing tarball filename and ten public import paths are unchanged. The locally migrated source does not prove an older release asset contains declarations: inspect and verify the exact downloaded tarball before using it in a strict TypeScript consumer. Publishing and promotion remain separate authorized operations. On failed staging checks, keep the stable endpoint unchanged and follow the existing rollback workflow; do not publish a partially verified client.
+
+Use headless browser automation. Vercel Hobby remains mandatory: the 300-second function configuration and bounded 240-second public probes do not promise durable sessions beyond an instance lifetime.
+
+## Required language for all updates
+
+Every contributor, human or AI, MUST keep this repository in strict TypeScript for every change, regardless of scope. This applies to server code, every registered game and simulation, the shared client and rules, tests, probes, release/deployment tools and future additions. Author executable code in .ts/.tsx and keep it in the compiler/source-coverage checks. Do not introduce authored JavaScript, handwritten declaration substitutes or weaker compiler gates. Generated JavaScript/declarations, third-party dependencies and native shell orchestration remain permitted.

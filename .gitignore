@@ -4,3 +4,11 @@ node_modules/
 !.env.example
 artifacts/
 
+
+# Generated shared-client ESM and declaration output
+multiplayer-server/packages/client/dist/
+
+# Generated TypeScript probe handlers and disposable Vercel fixtures
+dist/
+.hosting-probe/
+.store-probe/

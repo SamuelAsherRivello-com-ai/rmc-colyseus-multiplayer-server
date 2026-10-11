@@ -32,19 +32,16 @@ jobs:
         with:
           node-version: '24'
           cache: npm
+      - run: npm ci
+      - run: npm run check:typescript-source
+      - run: npm run typecheck
       - name: Require immutable main source, dedicated project and Hobby plan
         run: |
           git fetch origin main --no-tags
           git merge-base --is-ancestor HEAD origin/main
           test -n "$VERCEL_PROJECT_ID"
-          node --input-type=module <<'NODE'
-          const response=await fetch(`https://api.vercel.com/v2/teams/${process.env.VERCEL_ORG_ID}`,{headers:{Authorization:`Bearer ${process.env.VERCEL_TOKEN}`}});
-          const team=await response.json();if(!response.ok||team.billing?.plan!=='hobby')throw new Error('Free Hobby plan is required.');
-          console.log('Verified free Hobby plan; no paid features enabled.');
-          NODE
-      - run: npm ci
+          node --import tsx scripts/workflows/deploy-asteroids-1.ts
       - run: npm run check:docs
-      - run: npm run typecheck
       # Version preparation may safely rebase over concurrent main changes.
       # Verify the final immutable source, including any such changes.
       - run: npm test
@@ -60,13 +57,13 @@ jobs:
         env:
           SERVER_URL: ${{ steps.deploy.outputs.url }}
         run: |
-          node scripts/verify-release-health.mjs
-          node --input-type=module -e 'const data=await(await fetch(process.env.SERVER_URL+"/api/health")).json();if(JSON.stringify(data.games)!==JSON.stringify(["asteroids-coop"]))throw Error("Dedicated deployment must register only Asteroids");'
+          node --import tsx scripts/verify-release-health.ts
+          EXPECTED_GAME=asteroids-coop node --import tsx scripts/check-game-registration.ts
       - name: Verify four seats, recovery and ten-minute creator continuity
         env:
           SERVER_URL: ${{ steps.deploy.outputs.url }}
           LONG_SESSION_SECONDS: '600'
-        run: node scripts/asteroids-live-session.mjs
+        run: node --import tsx scripts/asteroids-live-session.ts
       - name: Promote the verified Asteroids deployment
         env:
           DEPLOYMENT_URL: ${{ steps.deploy.outputs.url }}
@@ -76,5 +73,5 @@ jobs:
           SERVER_URL: https://rmc-asteroids-coop.vercel.app
           LONG_SESSION_SECONDS: '8'
         run: |
-          node scripts/verify-release-health.mjs
-          node scripts/asteroids-live-session.mjs
+          node --import tsx scripts/verify-release-health.ts
+          node --import tsx scripts/asteroids-live-session.ts

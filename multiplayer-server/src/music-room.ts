@@ -1,3 +1,4 @@
+// Color index is bounded by private room admission capacity.
 import { Room, type Client } from '@colyseus/core';
 import { randomUUID } from 'node:crypto';
 
@@ -13,7 +14,7 @@ const validEvent = (v: unknown) => record(v) && safeInt(v.step) && safeInt(v.seq
 
 /** Admission and bounded transport only. Musical time and rules belong to the host browser. */
 export class MusicRoom extends Room {
-  maxClients = 4;
+  override maxClients = 4;
   private players = new Map<string, Person>();
   private hostId = '';
   private code = '';
@@ -23,7 +24,7 @@ export class MusicRoom extends Room {
 
   reserveHost(id: string) { this.hostId = id; }
 
-  onCreate(options: { code: string }) {
+  override onCreate(options: { code: string }) {
     this.code = options.code;
     this.setMetadata({ code: this.code });
     this.onMessage('snapshot', client => this.snapshot(client));
@@ -60,7 +61,7 @@ export class MusicRoom extends Room {
     }, 1000);
   }
 
-  onJoin(client: Client) {
+  override onJoin(client: Client) {
     if (this.ended) { void client.leave(); return; }
     const occupied = new Set([...this.players.values()].map(p => p.number));
     // Seat 1 belongs to the creator even when a guest's socket attaches first.
@@ -68,13 +69,13 @@ export class MusicRoom extends Room {
     while (occupied.has(number)) number++;
     if (!this.hostId) this.hostId = client.sessionId;
     const seed = parseInt(randomUUID().slice(0, 8), 16);
-    this.players.set(client.sessionId, { id: client.sessionId, number, name: `${adjectives[seed % 8]} ${animals[(seed >>> 4) % 8]}`, color: colors[number - 1], host: client.sessionId === this.hostId });
+    this.players.set(client.sessionId, { id: client.sessionId, number, name: `${adjectives[seed % 8]} ${animals[(seed >>> 4) % 8]}`, color: colors[number - 1]!, host: client.sessionId === this.hostId });
     this.snapshot(client);
     this.sendPresence();
   }
 
-  onDrop(client: Client) { this.depart(client); }
-  onLeave(client: Client) { this.depart(client); }
+  override onDrop(client: Client) { this.depart(client); }
+  override onLeave(client: Client) { this.depart(client); }
   private depart(client: Client) {
     if (client.sessionId === this.hostId) { this.end(); return; }
     this.players.delete(client.sessionId); this.limits.delete(client.sessionId);

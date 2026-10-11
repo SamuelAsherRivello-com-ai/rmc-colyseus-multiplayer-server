@@ -1,3 +1,4 @@
+// Palette indexes use a free seat selected from 0..3 after the capacity check.
 export const CLASSES = {
   warrior: { speed: 3.5, damage: 36, rate: .42, health: 160, armor: 1, range: 6 },
   valkyrie: { speed: 3.8, damage: 25, rate: .36, health: 140, armor: .6, range: 7 },
@@ -56,7 +57,7 @@ export class GauntletSimulation {
     if(this.players.has(id))return this.players.get(id)!;
     if(this.players.size>=4)throw new Error('Room full');
     const seat=[0,1,2,3].find(n=>![...this.players.values()].some(p=>p.number===n+1))!;
-    const p:Player={id,number:seat+1,name:'Player '+(seat+1),color:COLORS[seat],className:'warrior',x:8.5+seat,z:22,angle:Math.PI,hp:160,maxHp:160,cooldown:0,magicCooldown:0,shield:3,score:0,input:{x:0,z:0,attack:false,magic:false,at:-10}};
+    const p:Player={id,number:seat+1,name:'Player '+(seat+1),color:COLORS[seat]!,className:'warrior',x:8.5+seat,z:22,angle:Math.PI,hp:160,maxHp:160,cooldown:0,magicCooldown:0,shield:3,score:0,input:{x:0,z:0,attack:false,magic:false,at:-10}};
     this.players.set(id,p);return p;
   }
   remove(id:string) {this.players.delete(id);}

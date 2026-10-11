@@ -46,3 +46,15 @@
 - Test client packaging after changing its location or release scripts.
 - Live integration checks require an otherwise empty drawing session.
 - Do not deploy, publish a release, or create a pull request unless requested.
+
+## Strict TypeScript ownership
+
+- Author application, browser client/rules, tests, probes, configuration and workflow tools in `.ts`/`.tsx`. Keep emitted `.js`/`.d.ts` in ignored `dist/` trees; never hand-maintain declaration companions.
+- `tsconfig.json` owns the Node server, `tsconfig.client.json` owns browser modules (DOM libraries, no Node globals), and `tsconfig.tools.json` owns tests and scripts. All extend `tsconfig.base.json` with strict checking, checked indexing, exact optional properties, override checking, verbatim modules and consistent casing.
+- Run `npm run check:typescript-source` before `npm run typecheck`. The Git inventory includes tracked and nonignored untracked files; only dependency/generated directories are excluded. Add new first-party files to an owning compiler configuration.
+- `npm run build` gates production output on coverage, all compilers and tests. `npm run verify:tools` checks local CLI fixtures; `npm run verify:client-package` verifies every public import from the exact locally packed artifact with Bundler, NodeNext and loader-free JavaScript. Run `npm run build:client` before packing in each clean job.
+- Browser automation must run headlessly without visible windows. Use minimized windows only when the automation API explicitly supports them and headless operation is unavailable. Never open headed windows for routine tests.
+
+## Required language for all updates
+
+Every contributor, human or AI, MUST keep this repository in strict TypeScript for every change, regardless of scope. This applies to server code, every registered game and simulation, the shared client and rules, tests, probes, release/deployment tools and future additions. Author executable code in .ts/.tsx and keep it in the compiler/source-coverage checks. Do not introduce authored JavaScript, handwritten declaration substitutes or weaker compiler gates. Generated JavaScript/declarations, third-party dependencies and native shell orchestration remain permitted.

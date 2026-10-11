@@ -1,10 +1,10 @@
 import { Room, type Client } from '@colyseus/core';
 import { SumoSimulation } from './sumo-simulation.js';
 export class SumoRoom extends Room {
-  maxClients = 12;
+  override maxClients = 12;
   simulation = new SumoSimulation();
   limits = new Map<string, { time: number; count: number }>();
-  onCreate() {
+  override onCreate() {
     this.onMessage('input', (client, data) => { if (this.accept(client)) this.simulation.input(client.sessionId, data); });
     this.onMessage('snapshot', client => { if (this.accept(client)) client.send('snapshot', { players: this.playerList(), capacity: 12, strokes: [], gameState: this.simulation.snapshot() }); });
     this.setSimulationInterval(() => this.simulation.step(1 / 30), 1000 / 30);
@@ -21,7 +21,7 @@ export class SumoRoom extends Room {
     if (this.playerList().length === 1) this.simulation.add('dojo-bot', true);
     this.broadcast('presence', { players: this.playerList(), capacity: 12 });
   }
-  onJoin(client: Client) { this.simulation.remove('dojo-bot'); this.simulation.add(client.sessionId); this.updateBot(); }
-  onLeave(client: Client) { this.simulation.remove(client.sessionId); this.limits.delete(client.sessionId); this.broadcast('departed', client.sessionId); this.updateBot(); }
+  override onJoin(client: Client) { this.simulation.remove('dojo-bot'); this.simulation.add(client.sessionId); this.updateBot(); }
+  override onLeave(client: Client) { this.simulation.remove(client.sessionId); this.limits.delete(client.sessionId); this.broadcast('departed', client.sessionId); this.updateBot(); }
 }
 

@@ -34,19 +34,15 @@ jobs:
         with:
           node-version: '24'
           cache: npm
+      - run: npm ci
+      - run: npm run check:typescript-source
+      - run: npm run typecheck
       - name: Require immutable main source and the free Hobby plan
         run: |
           git fetch origin main --no-tags
           git merge-base --is-ancestor HEAD origin/main
-          node --input-type=module <<'NODE'
-          const response=await fetch(`https://api.vercel.com/v2/teams/${process.env.VERCEL_ORG_ID}`,{headers:{Authorization:`Bearer ${process.env.VERCEL_TOKEN}`}});
-          const team=await response.json();
-          if(!response.ok||team.billing?.plan!=='hobby')throw new Error('Free Hobby plan is required.');
-          console.log('Verified Hobby plan; existing shared project, no paid features.');
-          NODE
-      - run: npm ci
+          node --import tsx scripts/workflows/deploy-tetris-1.ts
       - run: npm run check:docs
-      - run: npm run typecheck
       - name: Verify every registered game locally
         run: npm test
       - name: Stage the selected source on the existing shared project
@@ -58,11 +54,11 @@ jobs:
           url="$(vercel deploy --prebuilt --prod --skip-domain --token="$VERCEL_TOKEN")"
           echo "url=$url" >> "$GITHUB_OUTPUT"
       - name: Verify the staged release version
-        run: node scripts/verify-release-health.mjs
+        run: node --import tsx scripts/verify-release-health.ts
         env:
           SERVER_URL: ${{ steps.deploy.outputs.url }}
       - name: Verify Tetris and every private game affected by the SDK repair
-        run: node --import tsx --test --test-concurrency=1 multiplayer-server/test/bomberman-integration.mjs multiplayer-server/test/combat-integration.mjs multiplayer-server/test/ring-rivals-integration.mjs multiplayer-server/test/space-invaders.mjs multiplayer-server/test/tetris-duel-integration.mjs
+        run: node --import tsx --test --test-concurrency=1 multiplayer-server/test/bomberman-integration.ts multiplayer-server/test/combat-integration.ts multiplayer-server/test/ring-rivals-integration.ts multiplayer-server/test/space-invaders.ts multiplayer-server/test/tetris-duel-integration.ts
         env:
           SERVER_URL: ${{ steps.deploy.outputs.url }}
       - name: Verify a four-minute two-client Hobby relay session
@@ -79,9 +75,9 @@ jobs:
         env:
           SERVER_URL: https://rmc-colyseus-multiplayer-server.vercel.app
         run: |
-          node scripts/verify-release-health.mjs
+          node --import tsx scripts/verify-release-health.ts
           npm run probe
-          node --import tsx --test multiplayer-server/test/tetris-duel-integration.mjs
+          node --import tsx --test multiplayer-server/test/tetris-duel-integration.ts
       - name: Restore the previous deployment if stable verification fails
         if: ${{ failure() && steps.promote.outcome == 'success' }}
         run: vercel rollback --token="$VERCEL_TOKEN"

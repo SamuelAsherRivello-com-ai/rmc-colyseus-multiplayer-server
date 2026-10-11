@@ -195,7 +195,8 @@ export function attachAsteroidsSocket(
         );
         if (!validFrame(value, registry.serial, members)) return;
         const stamp = `${value.runId}:${value.tick}`;
-        const [run, tick] = lastFrame.split(":").map(Number);
+        // lastFrame is always written as a run:tick pair.
+        const [run = NaN, tick = NaN] = lastFrame.split(":").map(Number);
         if (value.runId < run || (value.runId === run && value.tick <= tick))
           return;
         writing = true;

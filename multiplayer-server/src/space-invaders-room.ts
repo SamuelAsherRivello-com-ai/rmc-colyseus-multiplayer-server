@@ -13,7 +13,7 @@ const finiteTree = (value: unknown): boolean => typeof value === "number" ? Numb
 
 /** Routes opaque host state. No collision, movement, life or wave simulation runs here. */
 export class SpaceInvadersRoom extends Room {
-  maxClients = 4;
+  override maxClients = 4;
   private seats: Seat[] = [];
   private relay = new ParticipantHostRelay();
   private epoch = 0;
@@ -26,7 +26,7 @@ export class SpaceInvadersRoom extends Room {
   private emptyTimer?: ReturnType<typeof setTimeout>;
   private heartbeats = new Map<string, number>();
 
-  onCreate(options: { code: string }) {
+  override onCreate(options: { code: string }) {
     this.autoDispose = false;
     this.setMetadata({ code: options.code });
     this.onMessage("snapshot", client => this.snapshot(client));
@@ -102,7 +102,7 @@ export class SpaceInvadersRoom extends Room {
     return newToken;
   }
 
-  onJoin(client: Client, options: { reconnectToken?: string }) {
+  override onJoin(client: Client, options: { reconnectToken?: string }) {
     clearTimeout(this.emptyTimer);
     const seat = this.seats.find(s => s.token === options.reconnectToken && !s.sessionId);
     if (!seat) throw new ServerError(403, "Private seat reservation required");
@@ -117,11 +117,11 @@ export class SpaceInvadersRoom extends Room {
     this.snapshot(client);
   }
 
-  onLeave(client: Client, code?: number) {
+  override onLeave(client: Client, code?: number) {
     this.detach(client.sessionId, code === 4000 ? 0 : 15_000);
     if (!this.clients.length) this.emptyTimer = setTimeout(() => void this.disconnect(), 15_000);
   }
-  onDispose() { clearTimeout(this.emptyTimer); }
+  override onDispose() { clearTimeout(this.emptyTimer); }
 
   private detach(sessionId: string, grace = 0) {
     const seat = this.seats.find(s => s.sessionId === sessionId);

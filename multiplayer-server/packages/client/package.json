@@ -2,37 +2,65 @@
   "name": "@rmc/multiplayer-client",
   "version": "0.9.13",
   "type": "module",
-  "main": "index.js",
+  "main": "./dist/index.js",
   "exports": {
-    ".": "./index.js",
-    "./racing": "./racing-simulation.js",
-    "./racing-track": "./racing-track.js",
-    "./street-fighter": "./street-fighter-simulation.js",
-    "./bomberman": "./bomberman-rules.js",
-    "./bomberman-cpu": "./bomberman-cpu.js",
-    "./combat": "./combat-rules.js",
-    "./asteroids": "./asteroids-rules.js",
-    "./asteroids-connection": "./asteroids-connection.js",
-    "./tetris-duel": "./tetris-duel-rules.js"
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    },
+    "./racing": {
+      "types": "./dist/racing-simulation.d.ts",
+      "import": "./dist/racing-simulation.js",
+      "default": "./dist/racing-simulation.js"
+    },
+    "./racing-track": {
+      "types": "./dist/racing-track.d.ts",
+      "import": "./dist/racing-track.js",
+      "default": "./dist/racing-track.js"
+    },
+    "./street-fighter": {
+      "types": "./dist/street-fighter-simulation.d.ts",
+      "import": "./dist/street-fighter-simulation.js",
+      "default": "./dist/street-fighter-simulation.js"
+    },
+    "./bomberman": {
+      "types": "./dist/bomberman-rules.d.ts",
+      "import": "./dist/bomberman-rules.js",
+      "default": "./dist/bomberman-rules.js"
+    },
+    "./bomberman-cpu": {
+      "types": "./dist/bomberman-cpu.d.ts",
+      "import": "./dist/bomberman-cpu.js",
+      "default": "./dist/bomberman-cpu.js"
+    },
+    "./combat": {
+      "types": "./dist/combat-rules.d.ts",
+      "import": "./dist/combat-rules.js",
+      "default": "./dist/combat-rules.js"
+    },
+    "./asteroids": {
+      "types": "./dist/asteroids-rules.d.ts",
+      "import": "./dist/asteroids-rules.js",
+      "default": "./dist/asteroids-rules.js"
+    },
+    "./asteroids-connection": {
+      "types": "./dist/asteroids-connection.d.ts",
+      "import": "./dist/asteroids-connection.js",
+      "default": "./dist/asteroids-connection.js"
+    },
+    "./tetris-duel": {
+      "types": "./dist/tetris-duel-rules.d.ts",
+      "import": "./dist/tetris-duel-rules.js",
+      "default": "./dist/tetris-duel-rules.js"
+    }
   },
   "files": [
-    "index.js",
-    "README.md",
-    "racing-simulation.js",
-    "racing-track.js",
-    "street-fighter-simulation.js",
-    "street-fighter-combat.js",
-    "street-fighter-fighters.js",
-    "bomberman-rules.js",
-    "bomberman-cpu.js",
-    "combat-rules.js",
-    "asteroids-rules.js",
-    "asteroids-connection.js",
-    "asteroids-shared-connection.js",
-    "tetris-duel-rules.js",
-    "seat-reservation.js"
+    "dist",
+    "README.md"
   ],
   "dependencies": {
     "@colyseus/sdk": "0.17.43"
-  }
+  },
+  "types": "./dist/index.d.ts"
 }

@@ -1,3 +1,4 @@
+// Palette and collision indexes are bounded by modulo-twelve and local array loop bounds.
 export const RADIUS = 6;
 export type Input = { x: number; z: number; dash: boolean };
 export type Wrestler = { id: string; number: number; name: string; color: string; bot: boolean; x: number; z: number; vx: number; vz: number; angle: number; score: number; cooldown: number; out: number; shield: number; attacker: string; hitAt: number; input: Input; inputAt: number };
@@ -12,7 +13,7 @@ export class SumoSimulation {
   add(id: string, bot = false) {
     const occupied = new Set([...this.players.values()].map(p => p.number));
     let number = 1; while (occupied.has(number)) number++;
-    const p: Wrestler = { id, number, name: bot ? 'Dojo Bot' : `Sumo ${number}`, color: colors[(number - 1) % 12], bot, x: 0, z: 0, vx: 0, vz: 0, angle: 0, score: 0, cooldown: 0, out: 0, shield: 1.5, attacker: '', hitAt: -100, input: { x: 0, z: 0, dash: false }, inputAt: 0 };
+    const p: Wrestler = { id, number, name: bot ? 'Dojo Bot' : `Sumo ${number}`, color: colors[(number - 1) % 12]!, bot, x: 0, z: 0, vx: 0, vz: 0, angle: 0, score: 0, cooldown: 0, out: 0, shield: 1.5, attacker: '', hitAt: -100, input: { x: 0, z: 0, dash: false }, inputAt: 0 };
     this.players.set(id, p); this.spawn(p); return p;
   }
   remove(id: string) { this.players.delete(id); }
@@ -58,7 +59,7 @@ export class SumoSimulation {
       p.x += p.vx * dt; p.z += p.vz * dt;
     }
     for (let i = 0; i < list.length; i++) for (let j = i + 1; j < list.length; j++) {
-      const a = list[i], b = list[j]; if (a.out || b.out || a.shield || b.shield) continue;
+      const a = list[i]!, b = list[j]!; if (a.out || b.out || a.shield || b.shield) continue;
       const dx = b.x - a.x, dz = b.z - a.z, d = Math.hypot(dx, dz); if (d >= 1.22) continue;
       const nx = d ? dx / d : 1, nz = d ? dz / d : 0, overlap = (1.22 - d) / 2;
       a.x -= nx * overlap; a.z -= nz * overlap; b.x += nx * overlap; b.z += nz * overlap;

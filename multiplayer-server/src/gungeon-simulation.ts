@@ -1,3 +1,4 @@
+// Fixed palette/type indexes are bounded by selected seats and modulo-three enemy selection.
 export const WEAPONS = ['pistol', 'scatter', 'carbine'] as const;
 type Weapon = typeof WEAPONS[number];
 type Input = { x:number;y:number;ax:number;ay:number;shoot:boolean;roll:boolean };
@@ -16,7 +17,7 @@ export class GungeonSimulation {
   announce(text:string){this.event={serial:++this.serial,text};}
   resetProps(){this.props=[{id:1,x:5,y:8,hp:24},{id:2,x:25,y:10,hp:24},{id:3,x:14,y:4,hp:24},{id:4,x:16,y:14,hp:24}];}
   add(id:string){if(this.players.size>=4)return;const n=[1,2,3,4].find(n=>![...this.players.values()].some(p=>p.number===n))!;
-    this.players.set(id,{id,number:n,name:['Copper','Mint','Violet','Gold'][n-1],color:['#ff8c64','#69e4c7','#bd9bff','#ffdb77'][n-1],x:14+(n%2)*2,y:8+Math.floor((n-1)/2)*2,hp:100,maxHp:100,weapon:'pistol',ready:this.phase!=='lobby',cooldown:0,rollCooldown:0,rolling:0,shield:3,revive:0,damage:1,haste:1,speed:1,credits:0,kills:0,angle:0,burst:0,burstIn:0,lastInput:-100,input:zero()});
+    this.players.set(id,{id,number:n,name:['Copper','Mint','Violet','Gold'][n-1]!,color:['#ff8c64','#69e4c7','#bd9bff','#ffdb77'][n-1]!,x:14+(n%2)*2,y:8+Math.floor((n-1)/2)*2,hp:100,maxHp:100,weapon:'pistol',ready:this.phase!=='lobby',cooldown:0,rollCooldown:0,rolling:0,shield:3,revive:0,damage:1,haste:1,speed:1,credits:0,kills:0,angle:0,burst:0,burstIn:0,lastInput:-100,input:zero()});
   }
   remove(id:string){this.players.delete(id);this.shots=this.shots.filter(s=>s.owner!==id);if(this.phase==='combat'&&this.players.size&&![...this.players.values()].some(p=>p.hp>0)){this.phase='defeat';this.announce('The team has fallen');}}
   disconnect(id:string){const player=this.players.get(id);if(player){player.input=zero();player.lastInput=-100;}}
@@ -31,7 +32,7 @@ export class GungeonSimulation {
   blocked(x:number,y:number,r=.32){return x<1+r||x>29-r||y<1+r||y>17-r||COVER.some(c=>Math.abs(x-c.x)<c.w/2+r&&Math.abs(y-c.y)<c.h/2+r)||this.props.some(c=>c.hp>0&&Math.abs(x-c.x)<.5+r&&Math.abs(y-c.y)<.5+r);}
   move(body:{x:number;y:number},dx:number,dy:number,r=.32){if(!this.blocked(body.x+dx,body.y,r))body.x+=dx;if(!this.blocked(body.x,body.y+dy,r))body.y+=dy;}
   nextWave(){this.wave++;this.phase='combat';this.shots=[];const count=Math.min(32,3+this.wave*2+(this.players.size-1)*3);const boss=this.wave%5===0;
-    for(let i=0;i<count+(boss?1:0);i++){const kind=boss&&i===0?'boss':['chaser','gunner','radial'][i%3];const hp=kind==='boss'?240+80*this.players.size+20*this.wave:18+this.wave*3+this.players.size*3;let x=2+this.random()*26,y=this.random()>.5?2:16;for(let j=0;j<20&&this.blocked(x,y,.5);j++)x=2+this.random()*26;
+    for(let i=0;i<count+(boss?1:0);i++){const kind=boss&&i===0?'boss':['chaser','gunner','radial'][i%3]!;const hp=kind==='boss'?240+80*this.players.size+20*this.wave:18+this.wave*3+this.players.size*3;let x=2+this.random()*26,y=this.random()>.5?2:16;for(let j=0;j<20&&this.blocked(x,y,.5);j++)x=2+this.random()*26;
       this.enemies.push({id:++this.serial,kind,x,y,hp,maxHp:hp,cooldown:1+this.random(),angle:0});}
     this.announce(boss?`Wave ${this.wave} — THE CLOCKWORK WARDEN`:`Wave ${this.wave} — hold the vault`);
   }

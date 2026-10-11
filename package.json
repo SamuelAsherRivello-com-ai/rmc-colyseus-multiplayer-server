@@ -9,11 +9,17 @@
   },
   "scripts": {
     "dev": "tsx server.ts",
-    "check:docs": "node scripts/check-docs.mjs",
-    "typecheck": "tsc --noEmit",
-    "probe": "node scripts/probe.mjs",
-    "verify:long-session": "node scripts/long-lived-session.mjs",
-    "test": "node --import tsx --test --test-concurrency=1 multiplayer-server/test/*.mjs"
+    "check:docs": "tsx scripts/check-docs.ts",
+    "typecheck": "tsc -p tsconfig.json && tsc -p tsconfig.client.json && tsc -p tsconfig.tools.json",
+    "probe": "tsx scripts/probe.ts",
+    "verify:long-session": "tsx scripts/long-lived-session.ts",
+    "test": "node --import tsx --test --test-concurrency=1 multiplayer-server/test/*.ts",
+    "build:client": "tsx scripts/build-client.ts",
+    "check:typescript-source": "tsx scripts/check-typescript-source.ts",
+    "build:probe-handlers": "tsc -p tsconfig.probes-build.json",
+    "verify:client-package": "tsx scripts/verify-client-package.ts",
+    "build": "npm run check:typescript-source && npm run typecheck && npm test && npm run build:client && npm run build:probe-handlers",
+    "verify:tools": "tsx scripts/verify-tools.ts"
   },
   "dependencies": {
     "@colyseus/core": "0.17.44",

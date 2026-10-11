@@ -17,7 +17,11 @@ jobs:
           node-version: '24'
           cache: npm
       - run: npm ci
-      - run: npm run check:docs
+      - run: npm run check:typescript-source
       - run: npm run typecheck
+      - run: npm run check:docs
+      - run: npm run verify:tools
       - run: npm test
+      - run: npm run build:client
       - run: npm pack ./multiplayer-server/packages/client --dry-run
+      - run: npm run verify:client-package

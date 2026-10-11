@@ -1,0 +1,10 @@
+import metadata from '../../package.json' with { type: 'json' };
+import client from '../../multiplayer-server/packages/client/package.json' with { type: 'json' };
+import lock from '../../package-lock.json' with { type: 'json' };
+const next = process.env.VERSION;
+if (!next || !/^\d+\.\d+\.\d+$/.test(next || '')) throw new Error('VERSION must be a semantic version');
+const currentParts = metadata.version.split('.').map(Number);
+const nextParts = next.split('.').map(Number);
+const newer = nextParts.findIndex((value, index) => value !== currentParts[index]);
+if (newer >= 0 && nextParts[newer]! < currentParts[newer]!) throw new Error('Version must increase');
+if (newer < 0 && (client.version !== next || lock.version !== next)) throw new Error('Unpublished version files disagree');

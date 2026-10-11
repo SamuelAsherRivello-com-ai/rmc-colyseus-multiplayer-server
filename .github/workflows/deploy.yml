@@ -39,13 +39,14 @@ jobs:
         with:
           node-version: '24'
           cache: npm
+      - run: npm ci
+      - run: npm run check:typescript-source
+      - run: npm run typecheck
       - name: Require the selected source to be in main history
         run: |
           git fetch origin main --no-tags
           git merge-base --is-ancestor HEAD origin/main
-      - run: npm ci
       - run: npm run check:docs
-      - run: npm run typecheck
       - run: npm test
       - name: Stage the selected source with production settings
         id: deploy
@@ -58,16 +59,16 @@ jobs:
       - name: Verify the staged deployment serves the selected version
         env:
           SERVER_URL: ${{ steps.deploy.outputs.url }}
-        run: node scripts/verify-release-health.mjs
+        run: node --import tsx scripts/verify-release-health.ts
       - name: Verify every registered game against the staged deployment
         run: |
           set -o pipefail
           # Keep every assertion. A single bounded rerun addresses transient
           # public-network/cold-instance failures, with both attempts retained.
           state="$RUNNER_TEMP/staged-game-tests.json"
-          node --import tsx --test --test-concurrency=1 --test-rerun-failures="$state" multiplayer-server/test/*.mjs 2>&1 | tee "$RUNNER_TEMP/staged-game-first.log" && exit 0
+          node --import tsx --test --test-concurrency=1 --test-rerun-failures="$state" multiplayer-server/test/*.ts 2>&1 | tee "$RUNNER_TEMP/staged-game-first.log" && exit 0
           echo "::warning::Staged public checks had failures. Rerunning failed tests once; all must pass before promotion."
-          node --import tsx --test --test-concurrency=1 --test-rerun-failures="$state" multiplayer-server/test/*.mjs 2>&1 | tee "$RUNNER_TEMP/staged-game-rerun.log"
+          node --import tsx --test --test-concurrency=1 --test-rerun-failures="$state" multiplayer-server/test/*.ts 2>&1 | tee "$RUNNER_TEMP/staged-game-rerun.log"
         env:
           SERVER_URL: ${{ steps.deploy.outputs.url }}
       - name: Retain staged verification attempts
@@ -81,7 +82,7 @@ jobs:
             ${{ runner.temp }}/staged-game-rerun.log
           if-no-files-found: ignore
       - name: Verify private Tetris relay gameplay and recovery
-        run: node --import tsx --test multiplayer-server/test/tetris-duel-integration.mjs
+        run: node --import tsx --test multiplayer-server/test/tetris-duel-integration.ts
         env:
           SERVER_URL: ${{ steps.deploy.outputs.url }}
       - name: Verify a Vercel Hobby-compatible four-minute relay session
@@ -90,12 +91,12 @@ jobs:
           SERVER_URL: ${{ steps.deploy.outputs.url }}
           LONG_SESSION_SECONDS: '240'
       - name: Verify the four-minute Space Invaders session and host migration
-        run: node scripts/space-invaders-session.mjs
+        run: node --import tsx scripts/space-invaders-session.ts
         env:
           SERVER_URL: ${{ steps.deploy.outputs.url }}
           LONG_SESSION_SECONDS: '240'
       - name: Verify ten-minute Asteroids continuity and fixed host renewal
-        run: node scripts/asteroids-live-session.mjs
+        run: node --import tsx scripts/asteroids-live-session.ts
         env:
           SERVER_URL: ${{ steps.deploy.outputs.url }}
           LONG_SESSION_SECONDS: '600'
@@ -107,7 +108,7 @@ jobs:
       - name: Verify the stable production URL serves the selected version
         env:
           SERVER_URL: https://rmc-colyseus-multiplayer-server.vercel.app
-        run: node scripts/verify-release-health.mjs
+        run: node --import tsx scripts/verify-release-health.ts
       - name: Verify two clients relay through the stable production URL
         env:
           SERVER_URL: https://rmc-colyseus-multiplayer-server.vercel.app
@@ -115,9 +116,9 @@ jobs:
       - name: Verify Combat through the stable production URL
         env:
           SERVER_URL: https://rmc-colyseus-multiplayer-server.vercel.app
-        run: node --import tsx --test multiplayer-server/test/combat-integration.mjs
+        run: node --import tsx --test multiplayer-server/test/combat-integration.ts
       - name: Verify Asteroids through the stable production URL
-        run: node scripts/asteroids-live-session.mjs
+        run: node --import tsx scripts/asteroids-live-session.ts
         env:
           SERVER_URL: https://rmc-colyseus-multiplayer-server.vercel.app
           LONG_SESSION_SECONDS: '8'

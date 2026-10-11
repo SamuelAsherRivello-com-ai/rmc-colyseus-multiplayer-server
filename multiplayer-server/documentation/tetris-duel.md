@@ -15,8 +15,8 @@ Rooms are process-local. Free Vercel may terminate sockets around the Function d
 Verify from repository root using Node 24:
 
 ```sh
-node --test multiplayer-server/test/tetris-duel-rules.mjs
-node --import tsx --test multiplayer-server/test/tetris-duel-integration.mjs
+node --import tsx --test multiplayer-server/test/tetris-duel-rules.ts
+node --import tsx --test multiplayer-server/test/tetris-duel-integration.ts
 ```
 
 Set `SERVER_URL` for the integration test against a staged/public backend. Tests cover private admission/capacity, readiness, aim/commit, invalid commands, SDK and token recovery, token rotation, paused clocks, reserved-seat protection, top-out/rematch, privacy and recovery-budget forfeit. Local execution additionally tests process replacement. The consumer remains in development until its actual Pages duel is verified and the live-demo catalogs are updated.

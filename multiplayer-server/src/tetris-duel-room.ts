@@ -2,11 +2,10 @@ import { CloseCode, type Client } from '@colyseus/core';
 import { randomUUID } from 'node:crypto';
 import { performance } from 'node:perf_hooks';
 import { PrivateCodeRoom } from './private-code-room.js';
-// @ts-expect-error Browser-safe rules intentionally ship as JavaScript.
 import { TetrisDuel } from '../packages/client/tetris-duel-rules.js';
 
 export class TetrisDuelRoom extends PrivateCodeRoom {
-  maxClients = 2;
+  override maxClients = 2;
   simulation = new TetrisDuel(parseInt(randomUUID().slice(0,8),16));
   private tokens = new Map<string,string>();
   private recoveryStarts = new Map<string,number>();
@@ -14,7 +13,7 @@ export class TetrisDuelRoom extends PrivateCodeRoom {
   private limits = new Map<string,{time:number;count:number}>();
   private lastTick = performance.now();
 
-  onCreate(options: {code:string}) {
+  override onCreate(options: {code:string}) {
     this.setMetadata({code:options.code});
     this.onMessage('snapshot', client=>{if(this.accept(client))this.sendSnapshot(client);});
     for(const type of ['ready','rematch']) this.onMessage(type,(client,data)=>{
@@ -40,7 +39,7 @@ export class TetrisDuelRoom extends PrivateCodeRoom {
   }
   private sendSnapshot(client:Client) {
     const gameState=this.simulation.project(client.sessionId);if(!gameState)return;
-    client.send('snapshot',{capacity:2,players:[gameState.own,gameState.opponent].filter(Boolean).map(p=>({id:p.id,number:p.seat,name:p.name,color:p.color,connected:p.connected,ready:p.ready})),gameState});
+    client.send('snapshot',{capacity:2,players:[gameState.own,gameState.opponent].filter((p): p is NonNullable<typeof p> => p !== null).map(p=>({id:p.id,number:p.seat,name:p.name,color:p.color,connected:p.connected,ready:p.ready})),gameState});
   }
   private sendAll() {for(const client of this.clients)this.sendSnapshot(client);}
   tokenSeat(token:string) {return this.tokens.get(token);}
@@ -63,22 +62,22 @@ export class TetrisDuelRoom extends PrivateCodeRoom {
     }
     return undefined;
   }
-  onJoin(client:Client, options:{reconnectToken?:string;roomCodeRejoinSessionId?:string}) {
+  override onJoin(client:Client, options:{reconnectToken?:string;roomCodeRejoinSessionId?:string}) {
     this.privateCodeRoomJoined();
     const replaced=this.consumeRoomCodeRejoin(options.roomCodeRejoinSessionId);
     if(replaced){
       this.finishRecovery(replaced);
-      if(this.simulation.player(replaced)?.recoveryUsed>=15000){this.expire(replaced);void client.leave(4003);return;}
+      if((this.simulation.player(replaced)?.recoveryUsed ?? 0)>=15000){this.expire(replaced);void client.leave(4003);return;}
       this.simulation.reconnect(replaced,client.sessionId);
       for(const [token,id] of this.tokens)if(id===replaced)this.tokens.delete(token);
     }else if(!this.canAdmit()||!this.simulation.add(client.sessionId)){
       void client.leave(4003);return;
     }
     if(options.reconnectToken)this.tokens.set(options.reconnectToken,client.sessionId);
-    client.send('identity',{seat:this.simulation.player(client.sessionId).seat});
+    client.send('identity',{seat:this.simulation.player(client.sessionId)!.seat});
     this.sendAll();
   }
-  onReconnect(client:Client) {
+  override onReconnect(client:Client) {
     this.catchUp();this.finishRecovery(client.sessionId);
     this.privateCodeRoomJoined();this.clearRoomCodeRecovery(client.sessionId);
     this.simulation.reconnect(client.sessionId);this.lastTick=performance.now();this.sendAll();
@@ -89,13 +88,13 @@ export class TetrisDuelRoom extends PrivateCodeRoom {
     if(start!==undefined&&p)p.recoveryUsed=Math.min(15000,p.recoveryUsed+Date.now()-start);
     this.recoveryStarts.delete(id);
   }
-  async onDrop(client:Client) {
+  override async onDrop(client:Client) {
     this.catchUp();const p=this.simulation.player(client.sessionId);if(!p)return;
     this.simulation.disconnect(client.sessionId);this.recoveryStarts.set(client.sessionId,Date.now());this.sendAll();
     const seconds=Math.max(0.001,(15000-p.recoveryUsed)/1000);
     await this.waitForCodeRecovery(client,()=>this.expire(client.sessionId),seconds);
   }
-  onLeave(client:Client,code?:number) {
+  override onLeave(client:Client,code?:number) {
     if(this.privateCodeRoomLeft(client)||this.isRoomCodeRejoinPending(client.sessionId)||this.hasRoomCodeRecovery(client.sessionId))return;
     if(code===CloseCode.CONSENTED){this.expire(client.sessionId);return;}
     this.expire(client.sessionId);

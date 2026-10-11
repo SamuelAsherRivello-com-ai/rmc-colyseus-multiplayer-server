@@ -18,7 +18,9 @@ jobs:
           node-version: '24'
           cache: npm
       - run: npm ci
-      - run: node scripts/drawing-cross-host.mjs
+      - run: npm run check:typescript-source
+      - run: npm run typecheck
+      - run: node --import tsx scripts/drawing-cross-host.ts
         env:
           SERVER_URL: ${{ vars.RENDER_SERVICE_URL }}
           PROBE_RUN: ${{ inputs.run_id }}
