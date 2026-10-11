@@ -56,3 +56,8 @@ Large private Blob records can return compressed responses with weak ETags. Regi
 ### Dedicated deployment
 
 Asteroids uses an isolated project on the same required Vercel Hobby plan, built from this repository with `ASTEROIDS_ONLY=1`. Its verified production URL is `https://rmc-asteroids-coop.vercel.app` (released v0.9.12). Default/shared deployments retain all existing registrations and their existing endpoint. Run the normal Release workflow with `target=asteroids` for this target; the full source regression suite still runs before the dedicated live gate and artifact publication. The dedicated live gate verifies only its registered game, including four seats, guest recovery, ten-minute continuity, connection renewal, actual host loss and the stable production URL. This deployment does not replace the original shared endpoint used by other games.
+
+### Released contract
+
+Backend v0.9.12 is verified at https://rmc-asteroids-coop.vercel.app. [Release run 38087006732](https://github.com/SamuelAsherRivello/rmc-colyseus-multiplayer-server/actions/runs/38087006732) passed 154 final-source tests, staged 600-second continuity (11,508 frames, four renewals) and stable-endpoint verification. The [game v0.1.1](https://samuelasherrivello.github.io/babylon-lite-asteroids-multiplayer-clone/) pins the exact released client tarball; its README links the source and browser acceptance evidence. Earlier pending notes above describe implementation checkpoints, superseded by this release verification.
+
