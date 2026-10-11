@@ -1,6 +1,6 @@
 {
   "name": "@rmc/multiplayer-client",
-  "version": "0.9.12",
+  "version": "0.9.13",
   "type": "module",
   "main": "index.js",
   "exports": {
