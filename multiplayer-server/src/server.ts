@@ -59,6 +59,9 @@ const games = new Map<string, GameRoom>([
 if (process.env.ASTEROIDS_ONLY === '1') {
   for (const name of games.keys()) if (name !== 'asteroids-coop') games.delete(name);
 }
+if (process.env.MUSIC_ONLY === '1') {
+  for (const name of games.keys()) if (name !== 'music-maker') games.delete(name);
+}
 let joining: Promise<unknown> = Promise.resolve();
 const streetFighterInvites = new Map<string, { roomId: string; tokens: Set<string> }>();
 const privateRoomCodeAttempts = new PrivateRoomCodeRateLimiter();

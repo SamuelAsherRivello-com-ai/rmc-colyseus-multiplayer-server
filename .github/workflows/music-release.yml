@@ -1,0 +1,129 @@
+name: Release music backend
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: New semantic version, for example 0.1.0
+        required: true
+permissions:
+  contents: write
+concurrency:
+  group: backend-release-music
+  cancel-in-progress: false
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    outputs:
+      commit: ${{ steps.commit.outputs.sha }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci
+      - run: npm run check:docs
+      - run: npm run typecheck
+      - run: npm test
+      - name: Require a new or unpublished semantic version
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ inputs.version }}
+        run: |
+          node --input-type=module <<'NODE'
+          import metadata from './package.json' with { type: 'json' };
+          import client from './multiplayer-server/packages/client/package.json' with { type: 'json' };
+          import lock from './package-lock.json' with { type: 'json' };
+          const next = process.env.VERSION;
+          if (!/^\d+\.\d+\.\d+$/.test(next || '')) throw new Error('VERSION must be a semantic version');
+          const currentParts = metadata.version.split('.').map(Number);
+          const nextParts = next.split('.').map(Number);
+          const newer = nextParts.findIndex((value, index) => value !== currentParts[index]);
+          if (newer >= 0 && nextParts[newer] < currentParts[newer]) throw new Error('Version must increase');
+          if (newer < 0 && (client.version !== next || lock.version !== next)) throw new Error('Unpublished version files disagree');
+          NODE
+          if git ls-remote --exit-code --tags origin "refs/tags/v$VERSION" >/dev/null; then
+            echo "Tag v$VERSION already exists" >&2
+            exit 1
+          fi
+          if gh release view "v$VERSION" >/dev/null 2>&1; then
+            echo "Release v$VERSION already exists" >&2
+            exit 1
+          fi
+      - name: Set release version
+        env:
+          VERSION: ${{ inputs.version }}
+        run: |
+          node scripts/set-version.mjs
+          npm install --package-lock-only --ignore-scripts
+          npm pack ./multiplayer-server/packages/client --dry-run
+      - name: Push or resume the versioned source for deployment
+        id: commit
+        env:
+          VERSION: ${{ inputs.version }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add package.json package-lock.json multiplayer-server/packages/client/package.json
+          if ! git diff --cached --quiet; then
+            git commit -m "Release v$VERSION"
+            # Only the unpublished version commit is rebased. The deployment
+            # job checks and tests the resulting exact source before staging.
+            pushed=false
+            for attempt in 1 2 3; do
+              git fetch origin main --no-tags
+              if ! git merge-base --is-ancestor origin/main HEAD; then
+                git rebase origin/main
+              fi
+              if git push origin HEAD:main; then pushed=true; break; fi
+              sleep 2
+            done
+            test "$pushed" = true
+          fi
+          echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+  deploy:
+    needs: prepare
+    uses: ./.github/workflows/deploy-music.yml
+    with:
+      ref: ${{ needs.prepare.outputs.commit }}
+    secrets: inherit
+  publish:
+    if: needs.prepare.result == 'success' && needs.deploy.result == 'success'
+    needs: [prepare, deploy]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.prepare.outputs.commit }}
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - name: Require the verified commit to remain in main history
+        env:
+          VERSION: ${{ inputs.version }}
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          git fetch origin main --no-tags
+          git merge-base --is-ancestor HEAD origin/main
+          test "$(node -p "require('./package.json').version")" = "$VERSION"
+          if git ls-remote --exit-code --tags origin "refs/tags/v$VERSION" >/dev/null; then
+            echo "Tag v$VERSION already exists" >&2
+            exit 1
+          fi
+          if gh release view "v$VERSION" >/dev/null 2>&1; then
+            echo "Release v$VERSION already exists" >&2
+            exit 1
+          fi
+      - name: Publish one GitHub release from the verified deployment
+        env:
+          VERSION: ${{ inputs.version }}
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p artifacts
+          npm pack ./multiplayer-server/packages/client --pack-destination artifacts
+          gh release create "v$VERSION" artifacts/*.tgz --target "$(git rev-parse HEAD)" --title "v$VERSION" --generate-notes
