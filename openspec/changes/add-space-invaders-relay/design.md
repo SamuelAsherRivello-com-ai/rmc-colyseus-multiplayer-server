@@ -25,7 +25,7 @@ Four-minute game probe is required before promotion.
 
 ## Migration Plan
 
-Additive release through the verified workflow (currently selected v0.9.11); existing clients retain previous events and semantics.
+Additive release through the verified workflow (published v0.9.12 after concurrent shared-server fixes); existing clients retain previous events and semantics.
 Consumer pins the released tarball after public verification. Add linked Live
 Demos entry only after the consumer URL serves a verified playable build.
 

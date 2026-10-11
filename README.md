@@ -21,7 +21,7 @@ This repository provides the shared multiplayer service and has no standalone de
 - **Music Maker Multiplayer** — four-player host-simulated music sandbox with next-step local and three-second remote sounds. (In development.)
 - [**Neon Breaker Duo**](https://samuelasherrivello.github.io/babylon-lite-arkanoid-clone/) — co-operate to clear a neon brick field together. (In development.)
 - [**Ring Rivals**](https://samuelasherrivello.github.io/babylon-lite-ring-rivals/) — fight private online 1v1 boxing bouts from mirrored opponent-focused views. (In development.)
-- **Space Invaders** — Cooperative participant-hosted alien waves for one to four players. (In development.)
+- [**Space Invaders**](https://samuelasherrivello.github.io/babylon-lite-space-invaders-clone/) — Cooperative participant-hosted alien waves for one to four players, with personal lives, spectators and host migration.
 - [**Street Fighter II Clone**](https://samuelasherrivello.github.io/babylon-lite-street-fighter-clone/) — challenge a friend to an authoritative two-player arcade duel. (In development.)
 - [**Sumo Battle**](https://samuelasherrivello.github.io/babylon-lite-sumo-battle/) — push opponents out of the ring in an online sumo arena.
 - **Tetris Multiplayer Clone** — hidden-board timed aim-and-release duel with private opponent hints and garbage attacks. (In development.)

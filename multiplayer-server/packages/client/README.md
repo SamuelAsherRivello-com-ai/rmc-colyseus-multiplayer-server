@@ -65,7 +65,7 @@ This package is part of **RMC Colyseus Multiplayer Server**, which has no standa
 - **Music Maker Multiplayer** — four-player host-simulated music sandbox with next-step local and three-second remote sounds. (In development.)
 - [**Neon Breaker Duo**](https://samuelasherrivello.github.io/babylon-lite-arkanoid-clone/) — co-operate to clear a neon brick field together. (In development.)
 - [**Ring Rivals**](https://samuelasherrivello.github.io/babylon-lite-ring-rivals/) — fight private online 1v1 boxing bouts from mirrored opponent-focused views. (In development.)
-- **Space Invaders** — Cooperative participant-hosted alien waves for one to four players. (In development.)
+- [**Space Invaders**](https://samuelasherrivello.github.io/babylon-lite-space-invaders-clone/) — Cooperative participant-hosted alien waves for one to four players, with personal lives, spectators and host migration.
 - [**Street Fighter II Clone**](https://samuelasherrivello.github.io/babylon-lite-street-fighter-clone/) — private server-authoritative arcade duels with bounded same-seat recovery. (In development.)
 - [**Sumo Battle**](https://samuelasherrivello.github.io/babylon-lite-sumo-battle/) — push opponents out of the ring in an online sumo arena.
 - **Tetris Multiplayer Clone** — hidden-board timed aim-and-release duel with private opponent hints and garbage attacks. (In development.)
@@ -155,7 +155,7 @@ Combat differs from the generic code-rejoin guidance above: only SDK recovery pr
 
 Import the additive Asteroids rules and connection APIs. See the [Asteroids authority, recovery, tuning and hosting contract](../../documentation/asteroids.md). Public player IDs are distinct from private recovery tokens; guest hot drop frees a seat while the host retains personal lives. Host loss is terminal. This extension is unreleased pending sustained-hosting verification.
 
-## Space Invaders (next verified release)
+## Space Invaders (v0.9.12+)
 
 Create `new MultiplayerClient(endpoint, "space-invaders", {create:true})`, or join with `{code:"AB12", reconnectToken}`. Use `subscribe(listener)`, `connect()`, `send(type,value)` and `disconnect()` from the main export. Install the exact release tarball, rather than the source checkout: `npm install https://github.com/SamuelAsherRivello/rmc-colyseus-multiplayer-server/releases/download/v<VERSION>/rmc-multiplayer-client-<VERSION>.tgz`, replacing VERSION with the verified published version.
 

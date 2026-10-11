@@ -15,7 +15,7 @@
 | Music Maker Multiplayer | music-maker | 4 | next release | In development | Four-character private rooms; host loss ends session |
 | Neon Breaker Duo | neon-breaker-duo | 2 | 0.9.3+ | [Live playtest](https://samuelasherrivello.github.io/babylon-lite-arkanoid-clone/) | — |
 | Ring Rivals | ring-rivals | 2 | 0.9.3+ | [In development](https://samuelasherrivello.github.io/babylon-lite-ring-rivals/) | [Guide](../packages/client/README.md#coded-private-room-workflow) · [Admission](../src/server.ts#L39) · [Lifecycle](../src/private-code-room.ts#L14) |
-| Space Invaders | `space-invaders` | 1–4 | Participant-hosted simulation; private code, ordered inputs and checkpoint migration | In development | [Protocol](space-invaders.md) |
+| Space Invaders | `space-invaders` | 1–4 | 0.9.12+ | [Live demo](https://samuelasherrivello.github.io/babylon-lite-space-invaders-clone/) | [Protocol](space-invaders.md) · participant-hosted simulation, ordered inputs and checkpoint migration |
 | Street Fighter II Clone | street-fighter-ii | 2 | 0.9.4+ | [In development](https://samuelasherrivello.github.io/babylon-lite-street-fighter-clone/) | [Guide](../packages/client/README.md#coded-private-room-workflow) · [Admission](../src/server.ts#L72) · [Lifecycle](../src/private-code-room.ts#L14) |
 | Sumo Battle | sumo-battle | 12 | 0.2.0+ | [Live demo](https://samuelasherrivello.github.io/babylon-lite-sumo-battle/) | — |
 | Tetris Multiplayer Clone | tetris-duel | 2 | next release | In development | Four-character private rooms; authenticated 15-second cumulative recovery; [Rules/API](tetris-duel.md) |

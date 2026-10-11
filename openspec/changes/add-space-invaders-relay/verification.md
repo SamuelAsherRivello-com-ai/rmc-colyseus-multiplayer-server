@@ -1,0 +1,9 @@
+# Delivery evidence
+
+The exact v0.9.12 shared-client asset was published by release run [38087006732](https://github.com/SamuelAsherRivello/rmc-colyseus-multiplayer-server/actions/runs/38087006732). Production `/api/health` reported v0.9.12 and registered `space-invaders` on October 11, 2026 UTC. Its isolated protocol test passed in 21.078 seconds. Its production duration probe passed at 240 seconds, checkpoint tick 239, including host migration.
+
+The existing project remains free Vercel Hobby, confirmed by [audit 38084550878](https://github.com/SamuelAsherRivello/rmc-colyseus-multiplayer-server/actions/runs/38084550878). No paid service was added. Rooms remain process-local; cross-instance continuity and protection against process loss are not claimed. The unrelated private-room hosting proposal retains its broader requirements; its runtime context does not convert this isolated game's approved four-minute contract into completed infrastructure migration.
+
+[Consumer v0.0.9](https://samuelasherrivello.github.io/babylon-lite-space-invaders-clone/) passed a public two-browser WebGPU full loop in 49.256 seconds: wave clear, personal elimination, spectating, defeat, replay, refresh and living/spectator host handoffs in 2.727/3.109 seconds. Both clients agreed on restarted state, with no page or asset errors. Actual four-player public capture showed v0.0.9, all four seats, three lives each and original pixel art. See the [consumer verification guide](https://github.com/SamuelAsherRivello/babylon-lite-space-invaders-clone/blob/main/docs/verification.md) for measured impaired-network checks and physical-device limits.
+
+Documentation and TypeScript checks pass after catalog finalization. The game pins v0.9.12 even as other consumers advance shared main. Only this proposal is finalized; unrelated active changes are preserved.

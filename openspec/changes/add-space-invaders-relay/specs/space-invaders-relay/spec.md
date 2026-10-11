@@ -1,3 +1,7 @@
+## Purpose
+
+Provide isolated four-seat participant-hosted invasion sessions with bounded recovery, ordered input and compatible shared-client delivery.
+
 ## ADDED Requirements
 
 ### Requirement: Private four-seat recovery
