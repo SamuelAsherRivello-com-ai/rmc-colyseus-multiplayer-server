@@ -6,5 +6,5 @@
 ## 2. Hosting and delivery
 - [x] 2.1 Resolve free shared-state prerequisite and planned renewal without host migration.
 - [x] 2.2 Verify independent instances and ten-minute public continuity with guest recovery.
-- [ ] 2.3 Release/deploy backend, verify all games and record exact client asset/endpoint.
-- [ ] 2.4 Add the verified published Asteroids game to alphabetical README Live Demos and registry.
+- [x] 2.3 Release/deploy backend, verify full source regressions and the dedicated registered game, and record exact client asset/endpoint.
+- [x] 2.4 Add the verified published Asteroids game to alphabetical README Live Demos and registry.

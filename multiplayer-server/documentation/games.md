@@ -2,7 +2,7 @@
 
 | Game | Room key | Capacity | Client package | Frontend | Private-room workflow |
 |---|---|---|---|---|---|
-| Asteroids Multiplayer Clone | asteroids-coop | 4 | next release | In development | [Rules/API](asteroids.md) · fixed host, session-scoped private guest recovery |
+| Asteroids Multiplayer Clone | asteroids-coop | 4 | 0.9.12+ | [Live demo](https://samuelasherrivello.github.io/babylon-lite-asteroids-multiplayer-clone/) | [Rules/API](asteroids.md) · fixed host, session-scoped private guest recovery |
 | Bomberman Clone | bomberman | 4 | 0.9.2+ | [Multiplayer preview](https://samuelasherrivello.github.io/babylon-lite-bomberman-clone/?mode=online) | Optional growing plants block movement without damage. [Guide](../packages/client/README.md#coded-private-room-workflow) · [Admission](../src/server.ts#L39) · [Lifecycle](../src/private-code-room.ts#L14) |
 | Combat Clone | combat | 4 humans / 4 tanks | next release | In development | [Protocol](combat.md) · [Room](../src/combat-room.ts) |
 | Dust Circuit Rally | dust-circuit-rally | 4 | 0.6.0+ | [Live demo](https://samuelasherrivello.github.io/babylon-lite-super-offroad-clone/) | — |
