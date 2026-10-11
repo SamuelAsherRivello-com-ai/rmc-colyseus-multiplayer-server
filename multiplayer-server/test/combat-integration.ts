@@ -51,4 +51,3 @@ test('Combat real private admission, authoritative motion/fire, populations, rec
   console.log(JSON.stringify({combatProbe:'passed',endpoint,room:b.state.roomId,protocol:b.state.gameState!.protocol,tanks:b.state.gameState!.tanks.length,tick:b.state.gameState!.tick,mode:b.state.gameState!.mode}));
  }finally{clients.forEach(c=>c.disconnect());await delay(250);server?.kill();}
 });
-
