@@ -5,6 +5,6 @@
 - [x] 1.3 Implement isolated admission, host/readiness, four stable slots and protected recovery; verify integration races.
 ## 2. Compatible delivery
 - [x] 2.1 Add package export/SDK support, docs and packed import smoke verification.
-- [ ] 2.2 Verify Node 24 checks/regressions and staged/stable Combat probes.
-- [ ] 2.3 Commit only Combat changes on main, release/deploy and verify public two-client Combat.
+- [x] 2.2 Verify Node 24 checks/regressions and staged/stable Combat probes.
+- [x] 2.3 Commit only Combat changes on main, release/deploy and verify public two-client Combat.
 - [ ] 2.4 Link shipped game in both Live Demos lists and registry, synchronize release evidence.
