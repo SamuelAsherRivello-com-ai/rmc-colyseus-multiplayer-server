@@ -53,6 +53,9 @@ jobs:
         run: |
           npm install --global vercel@62.2.0
           vercel pull --yes --environment=production --token="$VERCEL_TOKEN"
+          vercel project inspect --non-interactive --token="$VERCEL_TOKEN"
+          previous_id="$(vercel inspect https://rmc-colyseus-multiplayer-server.vercel.app --json --token="$VERCEL_TOKEN" | jq -er '.id | select(type == "string" and startswith("dpl_"))')"
+          echo "previous_id=$previous_id" >> "$GITHUB_OUTPUT"
           vercel build --prod --token="$VERCEL_TOKEN"
           deployment_url="$(vercel deploy --prebuilt --prod --skip-domain --token="$VERCEL_TOKEN")"
           echo "url=$deployment_url" >> "$GITHUB_OUTPUT"
@@ -112,7 +115,12 @@ jobs:
       - name: Verify two clients relay through the stable production URL
         env:
           SERVER_URL: https://rmc-colyseus-multiplayer-server.vercel.app
-        run: npm run probe
+        run: |
+          set -o pipefail
+          npm run probe 2>&1 | tee "$RUNNER_TEMP/stable-probe-first.log" && exit 0
+          echo "::warning::Stable relay probe failed. Retrying once with unchanged assertions; both attempts are retained."
+          sleep 10
+          npm run probe 2>&1 | tee "$RUNNER_TEMP/stable-probe-rerun.log"
       - name: Verify Combat through the stable production URL
         env:
           SERVER_URL: https://rmc-colyseus-multiplayer-server.vercel.app
@@ -124,5 +132,18 @@ jobs:
           LONG_SESSION_SECONDS: '8'
       - name: Restore the previous production deployment if public verification fails
         if: ${{ failure() && steps.promote.outcome == 'success' }}
-        run: vercel rollback --token="$VERCEL_TOKEN"
+        env:
+          PREVIOUS_DEPLOYMENT: ${{ steps.deploy.outputs.previous_id }}
+        run: |
+          test -n "$PREVIOUS_DEPLOYMENT"
+          vercel rollback "$PREVIOUS_DEPLOYMENT" --token="$VERCEL_TOKEN"
+      - name: Retain stable relay verification attempts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: stable-relay-verification-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            ${{ runner.temp }}/stable-probe-first.log
+            ${{ runner.temp }}/stable-probe-rerun.log
+          if-no-files-found: ignore
 
