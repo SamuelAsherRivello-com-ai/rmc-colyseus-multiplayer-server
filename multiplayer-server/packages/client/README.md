@@ -62,7 +62,7 @@ This package is part of **RMC Colyseus Multiplayer Server**, which has no standa
 - [**Gauntlet Clone 3D**](https://samuelasherrivello.github.io/babylon-lite-gauntlet-clone-3d/) — team up to destroy summoning altars and escape a 3D dungeon.
 - **Just Like Rabbits** — shared rabbit observation habitat with participant-host migration. (In development.)
 - [**Multiplayer Draw**](https://samuelasherrivello.github.io/babylon-lite-multiplayer-draw/) — a shared drawing canvas with hot join and departure cleanup.
-- **Music Maker Multiplayer** — four-player host-simulated music sandbox with next-step local and three-second remote sounds. (In development.)
+- [**Music Maker Multiplayer**](https://samuelasherrivello.github.io/babylon-lite-music-maker-multiplayer/) — four-player host-simulated music sandbox with next-step local and three-second remote sounds.
 - [**Neon Breaker Duo**](https://samuelasherrivello.github.io/babylon-lite-arkanoid-clone/) — co-operate to clear a neon brick field together. (In development.)
 - [**Ring Rivals**](https://samuelasherrivello.github.io/babylon-lite-ring-rivals/) — fight private online 1v1 boxing bouts from mirrored opponent-focused views. (In development.)
 - [**Space Invaders**](https://samuelasherrivello.github.io/babylon-lite-space-invaders-clone/) — Cooperative participant-hosted alien waves for one to four players, with personal lives, spectators and host migration.
@@ -144,6 +144,7 @@ Matches are best of three, with 60-second rounds, knockout and health decisions,
 
 Create `new MultiplayerClient(endpoint, "music-maker", {create:true})` or join with `{code:"AB12"}`. Four players; `state.hostId` owns simulation. Subscribe to `musicIntent`, `musicClockRequest`, `musicClockReply`, `musicCommit`, `musicSnapshotRequest`, `musicSnapshot`, `musicRejected`, and `musicEnded`; payload is `state.musicMessage`. Use `send(type,payload)`. A host sends commits `{epoch,sequence,origin,step,sound,deadline}`; sound is kick/snare/hat/tone. Intents contain epoch/sequence/step/sound and receive a relay-stamped origin. Clock requests contain request/sent and receive origin; host replies with target/request/sent/received/hostNow/start/epoch. Snapshots contain target/epoch/start/hostNow/sequence/events, at most 112 pending events and 14 KiB encoded. Guest messages are bounded at 32/s; host output aggregation at 128/s. Heartbeats run every five seconds. Host loss emits musicEnded and ends the session, without retrying into a new room. Origins play at the source deadline, all other listeners at deadline+3000 ms. Browser host is authoritative; relay never creates beats.
 
+Published in v0.9.13. Pass `https://rmc-music-maker.vercel.app` as the endpoint. The creator's reserved identity owns host authority and seat 1 even if another socket arrives first. Music opts into bounded missing-room and same-reservation socket retries; unexpected host loss remains terminal. The browser client coordinates planned transport renewal while retaining epoch and original event deadlines. See the game's README for measured duration and timing evidence.
 
 ## Combat Clone
 
@@ -169,6 +170,6 @@ Rooms are process-local on the free Vercel Hobby deployment. Participant-host mi
 
 ### Bounded private relay admission
 
-Combat, Bomberman, Space Invaders, Ring Rivals and Tetris retry transient missing-room lookups and socket attachment within a bounded budget. Socket retries reuse the original reservation and identity; they do not reserve extra seats or create replacement rooms. Full rooms, malformed codes and invalid private tokens remain terminal. Leaving cancels outstanding retries. These retries do not promise cross-instance durability.
+Combat, Bomberman, Space Invaders, Ring Rivals, Tetris and Music Maker retry transient missing-room lookups and socket attachment within a bounded budget. Socket retries reuse the original reservation and identity; they do not reserve extra seats or create replacement rooms. Full rooms, malformed codes and invalid private tokens remain terminal. Leaving cancels outstanding retries. These retries do not promise cross-instance durability.
 
 Each opted-in socket handshake is bounded to three seconds. A socket that closes before joining rejects promptly; failure, timeout and cancellation close the attempted socket. This covers a gap in the pinned SDK, whose reservation promise otherwise can remain pending after a pre-join close. Retries keep their existing original-seat budget and do not repeat admission.

@@ -12,7 +12,7 @@
 | Gauntlet Clone 3D | gauntlet-3d | 4 | 0.5.0+ | [Live demo](https://samuelasherrivello.github.io/babylon-lite-gauntlet-clone-3d/) | — |
 | Just Like Rabbits | just-like-rabbits | 12 | next release | In development | — |
 | Multiplayer Draw | multiplayer-draw | 12 | 0.1.0+ | [Live demo](https://samuelasherrivello.github.io/babylon-lite-multiplayer-draw/) | — |
-| Music Maker Multiplayer | music-maker | 4 | next release | In development | Four-character private rooms; host loss ends session |
+| Music Maker Multiplayer | music-maker | 4 | 0.9.13 | [Live demo](https://samuelasherrivello.github.io/babylon-lite-music-maker-multiplayer/) | Four-character private rooms; host loss ends session |
 | Neon Breaker Duo | neon-breaker-duo | 2 | 0.9.3+ | [Live playtest](https://samuelasherrivello.github.io/babylon-lite-arkanoid-clone/) | — |
 | Ring Rivals | ring-rivals | 2 | 0.9.3+ | [In development](https://samuelasherrivello.github.io/babylon-lite-ring-rivals/) | [Guide](../packages/client/README.md#coded-private-room-workflow) · [Admission](../src/server.ts#L39) · [Lifecycle](../src/private-code-room.ts#L14) |
 | Space Invaders | `space-invaders` | 1–4 | 0.9.12+ | [Live demo](https://samuelasherrivello.github.io/babylon-lite-space-invaders-clone/) | [Protocol](space-invaders.md) · participant-hosted simulation, ordered inputs and checkpoint migration |

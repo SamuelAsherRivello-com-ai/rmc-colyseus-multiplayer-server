@@ -18,7 +18,7 @@ This repository provides the shared multiplayer service and has no standalone de
 - [**Gauntlet Clone 3D**](https://samuelasherrivello.github.io/babylon-lite-gauntlet-clone-3d/) — team up to destroy summoning altars and escape a 3D dungeon.
 - **Just Like Rabbits** — shared rabbit observation habitat with participant-host migration. (In development.)
 - [**Multiplayer Draw**](https://samuelasherrivello.github.io/babylon-lite-multiplayer-draw/) — draw together from separate computers or browser tabs.
-- **Music Maker Multiplayer** — four-player host-simulated music sandbox with next-step local and three-second remote sounds. (In development.)
+- [**Music Maker Multiplayer**](https://samuelasherrivello.github.io/babylon-lite-music-maker-multiplayer/) — four-player host-simulated music sandbox with next-step local and three-second remote sounds.
 - [**Neon Breaker Duo**](https://samuelasherrivello.github.io/babylon-lite-arkanoid-clone/) — co-operate to clear a neon brick field together. (In development.)
 - [**Ring Rivals**](https://samuelasherrivello.github.io/babylon-lite-ring-rivals/) — fight private online 1v1 boxing bouts from mirrored opponent-focused views. (In development.)
 - [**Space Invaders**](https://samuelasherrivello.github.io/babylon-lite-space-invaders-clone/) — Cooperative participant-hosted alien waves for one to four players, with personal lives, spectators and host migration.
@@ -65,6 +65,8 @@ The published Bomberman client pinned to `v0.9.7` requires six-character invite 
 The root `package.json` is the version source. Run the **Release** workflow with a new semantic version. It checks and commits the root/client versions, stages a production Vercel build without changing the public URL, runs health, all registered-game integration tests, and a four-minute two-client relay against the staged deployment, then promotes that deployment to `https://rmc-colyseus-multiplayer-server.vercel.app`. It verifies the stable URL before publishing one tagged GitHub Release with the client tarball. Existing games configured for that URL automatically reach the new server. Sessions are process-local: Vercel can end or route a connection to another instance, and the four-minute test does not promise continuity across instances or beyond the Function limit. To deploy manually, dispatch **Deploy backend release** with a commit or tag at the current `main` commit.
 
 The deployment workflow uses the configured GitHub Actions secrets `VERCEL_TOKEN`, `VERCEL_ORG_ID`, and `VERCEL_PROJECT_ID`; it never prints them or commits credentials. The legacy `render.yaml` remains for historical recovery only and is not the active release path.
+
+Music Maker uses the dedicated free Hobby endpoint `https://rmc-music-maker.vercel.app` and the **Release music backend** workflow (`music-release.yml`). Its setup/deploy workflows require Hobby, retain full source regressions, verify public Music room/relay behavior and publish the shared-client tarball only after stable-endpoint verification. This isolated deployment registers only Music and does not replace the shared endpoint used by other games. Browser clients renew the relay before the 300-second connection limit; the browser host retains musical authority.
 
 ## Project Details
 
