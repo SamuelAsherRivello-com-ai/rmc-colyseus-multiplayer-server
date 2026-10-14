@@ -91,7 +91,10 @@ export class CatHangoutRoom extends Room {
       else if (cat.activity === "wander") cat.activity = "idle";
       cat.x = Math.max(-bounds, Math.min(bounds, cat.x)); cat.z = Math.max(-bounds, Math.min(bounds, cat.z));
     }
-    this.broadcast("catState", this.snapshot());
+    // The released shared browser client consumes `presence` before custom
+    // game events are registered. Keep Cat Hangout motion authoritative while
+    // using that standard snapshot channel for all clients.
+    this.broadcast("presence", this.snapshot());
   }
 
   override onJoin(client: Client) { this.removeBots(); this.addHuman(client.sessionId); this.fillBots(); this.broadcast("presence", this.snapshot()); }
