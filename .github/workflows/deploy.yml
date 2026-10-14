@@ -63,24 +63,49 @@ jobs:
         env:
           SERVER_URL: ${{ steps.deploy.outputs.url }}
         run: node --import tsx scripts/verify-release-health.ts
-      - name: Verify registered games A-M against the staged deployment
+      - name: Verify Asteroids against the staged deployment
         run: |
           set -o pipefail
-          # Keep every assertion. Splitting the sequential public suite makes
-          # meaningful progress visible before the workflow's long sessions.
-          state="$RUNNER_TEMP/staged-game-a-m-tests.json"
-          node --import tsx --test --test-concurrency=1 --test-rerun-failures="$state" multiplayer-server/test/[a-m]*.ts 2>&1 | tee "$RUNNER_TEMP/staged-game-a-m-first.log" && exit 0
-          echo "::warning::Staged public checks had failures. Rerunning failed A-M tests once; both attempts are retained."
-          node --import tsx --test --test-concurrency=1 --test-rerun-failures="$state" multiplayer-server/test/[a-m]*.ts 2>&1 | tee "$RUNNER_TEMP/staged-game-a-m-rerun.log"
+          state="$RUNNER_TEMP/staged-game-asteroids-tests.json"
+          node --import tsx --test --test-concurrency=1 --test-rerun-failures="$state" multiplayer-server/test/asteroids-*.ts 2>&1 | tee "$RUNNER_TEMP/staged-game-asteroids-first.log" && exit 0
+          echo "::warning::Staged Asteroids checks had failures. Rerunning failed tests once; both attempts are retained."
+          node --import tsx --test --test-concurrency=1 --test-rerun-failures="$state" multiplayer-server/test/asteroids-*.ts 2>&1 | tee "$RUNNER_TEMP/staged-game-asteroids-rerun.log"
         env:
           SERVER_URL: ${{ steps.deploy.outputs.url }}
-      - name: Verify registered games N-Z against the staged deployment
+      - name: Verify Bomberman against the staged deployment
         run: |
           set -o pipefail
-          state="$RUNNER_TEMP/staged-game-n-z-tests.json"
-          node --import tsx --test --test-concurrency=1 --test-rerun-failures="$state" multiplayer-server/test/[n-z]*.ts 2>&1 | tee "$RUNNER_TEMP/staged-game-n-z-first.log" && exit 0
-          echo "::warning::Staged public checks had failures. Rerunning failed N-Z tests once; both attempts are retained."
-          node --import tsx --test --test-concurrency=1 --test-rerun-failures="$state" multiplayer-server/test/[n-z]*.ts 2>&1 | tee "$RUNNER_TEMP/staged-game-n-z-rerun.log"
+          state="$RUNNER_TEMP/staged-game-bomberman-tests.json"
+          node --import tsx --test --test-concurrency=1 --test-rerun-failures="$state" multiplayer-server/test/bomberman-*.ts 2>&1 | tee "$RUNNER_TEMP/staged-game-bomberman-first.log" && exit 0
+          echo "::warning::Staged Bomberman checks had failures. Rerunning failed tests once; both attempts are retained."
+          node --import tsx --test --test-concurrency=1 --test-rerun-failures="$state" multiplayer-server/test/bomberman-*.ts 2>&1 | tee "$RUNNER_TEMP/staged-game-bomberman-rerun.log"
+        env:
+          SERVER_URL: ${{ steps.deploy.outputs.url }}
+      - name: Verify Cat Hangout and Combat against the staged deployment
+        run: |
+          set -o pipefail
+          state="$RUNNER_TEMP/staged-game-cat-combat-tests.json"
+          node --import tsx --test --test-concurrency=1 --test-rerun-failures="$state" multiplayer-server/test/cat-hangout-room.ts multiplayer-server/test/combat-*.ts 2>&1 | tee "$RUNNER_TEMP/staged-game-cat-combat-first.log" && exit 0
+          echo "::warning::Staged Cat Hangout and Combat checks had failures. Rerunning failed tests once; both attempts are retained."
+          node --import tsx --test --test-concurrency=1 --test-rerun-failures="$state" multiplayer-server/test/cat-hangout-room.ts multiplayer-server/test/combat-*.ts 2>&1 | tee "$RUNNER_TEMP/staged-game-cat-combat-rerun.log"
+        env:
+          SERVER_URL: ${{ steps.deploy.outputs.url }}
+      - name: Verify Garden and Gungeon against the staged deployment
+        run: |
+          set -o pipefail
+          state="$RUNNER_TEMP/staged-game-garden-gungeon-tests.json"
+          node --import tsx --test --test-concurrency=1 --test-rerun-failures="$state" multiplayer-server/test/garden.ts multiplayer-server/test/gungeon-*.ts 2>&1 | tee "$RUNNER_TEMP/staged-game-garden-gungeon-first.log" && exit 0
+          echo "::warning::Staged Garden and Gungeon checks had failures. Rerunning failed tests once; both attempts are retained."
+          node --import tsx --test --test-concurrency=1 --test-rerun-failures="$state" multiplayer-server/test/garden.ts multiplayer-server/test/gungeon-*.ts 2>&1 | tee "$RUNNER_TEMP/staged-game-garden-gungeon-rerun.log"
+        env:
+          SERVER_URL: ${{ steps.deploy.outputs.url }}
+      - name: Verify remaining registered games against the staged deployment
+        run: |
+          set -o pipefail
+          state="$RUNNER_TEMP/staged-game-remaining-tests.json"
+          node --import tsx --test --test-concurrency=1 --test-rerun-failures="$state" multiplayer-server/test/integration.ts multiplayer-server/test/just-like-rabbits.ts multiplayer-server/test/local-build-environment.ts multiplayer-server/test/music-integration.ts multiplayer-server/test/gauntlet-*.ts multiplayer-server/test/gauntlet2d-*.ts 2>&1 | tee "$RUNNER_TEMP/staged-game-remaining-first.log" && exit 0
+          echo "::warning::Remaining staged-game checks had failures. Rerunning failed tests once; both attempts are retained."
+          node --import tsx --test --test-concurrency=1 --test-rerun-failures="$state" multiplayer-server/test/integration.ts multiplayer-server/test/just-like-rabbits.ts multiplayer-server/test/local-build-environment.ts multiplayer-server/test/music-integration.ts multiplayer-server/test/gauntlet-*.ts multiplayer-server/test/gauntlet2d-*.ts 2>&1 | tee "$RUNNER_TEMP/staged-game-remaining-rerun.log"
         env:
           SERVER_URL: ${{ steps.deploy.outputs.url }}
       - name: Retain staged verification attempts
