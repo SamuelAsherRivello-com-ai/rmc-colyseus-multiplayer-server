@@ -98,7 +98,11 @@ test("Just Like Rabbits shares server-owned state across twelve seats and reject
     second.send("action", { type: "plant", payload: { x: 99, z: 0 } });
     await delay(150);
     assert.equal(first.state.gameState?.plots.length, 1, "invalid plot was accepted");
-    const additional = await Promise.all(Array.from({ length: 10 }, () => join()));
+    // Shared rooms are intentionally joined in sequence. Bursting ten HTTP
+    // admissions at a serverless endpoint can route requests to independent
+    // warm instances before the first room listing is visible there.
+    const additional = [];
+    for (let index = 0; index < 10; index++) additional.push(await join());
     await until(() => first.state.players.length === 12, "twelve players were not admitted");
     assert.ok(additional.every(client => client.state.status === "connected"));
     await until(() => first.state.gameState?.rabbits.filter(rabbit => rabbit.kind === "bot").length === 1, "bot population did not contract at capacity");
