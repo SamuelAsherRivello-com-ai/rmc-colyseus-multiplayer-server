@@ -2,7 +2,7 @@
 
 # RMC Colyseus Multiplayer Server
 
-Rivello Multimedia Consulting (RMC), led by [Samuel Asher Rivello](https://www.samuelasherrivello.com/) created this relay server using Colyseus as a prototype backend for new multiplayer games.
+Rivello Multimedia Consulting (RMC), led by [Samuel Asher Rivello](https://www.samuelasherrivello.com/) created this Colyseus relay server for multiplayer applications, including games. Consumer projects reuse the shared Vercel deployment when its rooms, protocol, and shared browser client fit.
 
 ## Live Demos
 
@@ -63,7 +63,7 @@ The published Bomberman client pinned to `v0.9.7` requires six-character invite 
 
 ### 🛠 Release Version
 
-The root `package.json` is the version source. Run the **Release** workflow with a new semantic version. It checks and commits the root/client versions, stages a production Vercel build without changing the public URL, runs health, all registered-game integration tests, and a four-minute two-client relay against the staged deployment, then promotes that deployment to `https://rmc-colyseus-multiplayer-server.vercel.app`. It verifies the stable URL before publishing one tagged GitHub Release with the client tarball. Existing games configured for that URL automatically reach the new server. Sessions are process-local: Vercel can end or route a connection to another instance, and the four-minute test does not promise continuity across instances or beyond the Function limit. To deploy manually, dispatch **Deploy backend release** with a commit or tag at the current `main` commit.
+The root `package.json` is the version source. A consumer that reuses an existing room, protocol, and compatible shared-client capability needs no server release or deployment. A new room, protocol, authoritative server behavior, or shared-client capability requires a server-first release. Run the server regression suite, build and release the shared client when it changed, then run the **Release** workflow with a new semantic version. It stages a production Vercel build without changing the public URL, runs health and all registered-game integration tests, and verifies a four-minute two-client relay against the staged deployment. It then promotes that deployment to `https://rmc-colyseus-multiplayer-server.vercel.app`, verifies the stable URL, and publishes one tagged GitHub Release with the client tarball. Existing consumers configured for that URL automatically reach the compatible new server. Sessions are process-local: Vercel can end or route a connection to another instance, and the four-minute test does not promise continuity across instances or beyond the Function limit. To deploy manually, dispatch **Deploy backend release** with a commit or tag at the current `main` commit.
 
 The deployment workflow uses the configured GitHub Actions secrets `VERCEL_TOKEN`, `VERCEL_ORG_ID`, and `VERCEL_PROJECT_ID`; it never prints them or commits credentials. The legacy `render.yaml` remains for historical recovery only and is not the active release path.
 
@@ -136,9 +136,9 @@ HTTP: `GET /api/health`; `POST /api/join/multiplayer-draw` returns a Colyseus se
 
 The checked-in server keeps its room index, matchmaking, and recovery state in process memory. Those states are not shared across Vercel function instances or restored after process loss. A room link can rejoin a room while that same process still owns it; a fresh process requires a new room. The `standardize-private-room-flow` record documents pending cross-instance continuity and release criteria. It does not start a local workflow. The historical Render Blueprint and [recorded hosting evidence](multiplayer-server/documentation/feasibility.md) describe a prior hosting direction, not a completed migration.
 
-### Additive release policy
+### Additive server release policy
 
-Games may add isolated room keys and additive shared-client capabilities after the full server regression suite passes. A deployment can interrupt active in-memory rooms, which is an accepted temporary limitation; compatible existing games reconnect using their existing protocol. Update another game only when a targeted compatibility check identifies an actual contract change, not merely because a new game was added.
+Applications, including games, must check the documented room, protocol, and shared-client contracts before asking for server work. Reuse is the normal result when an existing capability fits. Only a new room, protocol, authoritative behavior, or shared-client capability needs an additive server release. Run the full server regression suite for that release. Build and release the shared client when it changes, deploy the verified server to the existing shared Vercel deployment, and complete public two-client verification for the new or changed capability. A deployment can interrupt active in-memory rooms, which is an accepted temporary limitation; compatible existing consumers reconnect using their existing protocol. Update another consumer only when a targeted compatibility check identifies an actual contract change, not merely because a new consumer was added.
 
 There is no durable storage, account system, or separate lobby service in the checked-in server. The release workflow deploys a selected tag to Vercel and verifies the resulting public health version and game tests; its presence does not prove that a particular public endpoint currently serves this working tree.
 

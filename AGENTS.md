@@ -25,12 +25,43 @@
   limitation without asking the user to switch providers or upgrade.
 - This requirement does not authorize deployment; deploy only when requested.
 
+## Shared multiplayer infrastructure and consumers
+
+This permanent repository is the shared multiplayer infrastructure for its
+existing and future consumer applications, including games. Work in this
+repository; do not fork, copy, replace, or delete it for a consumer project.
+The shared Vercel deployment remains the default backend. An approved server
+release deploys over that existing deployment after compatibility and release
+verification.
+
+Before changing a consumer, use this checklist:
+
+- Treat a consumer as client-only unless the request explicitly needs
+  multiplayer. Do not call ordinary application work a game.
+- If multiplayer is requested, inspect the registered rooms, documented
+  protocol, and released shared client first. Reuse the shared endpoint and
+  exact compatible client release when they meet the consumer's needs.
+- Classify the result. Reusing an existing room, protocol, and shared-client
+  capability requires no server change, release, or deployment. A new room,
+  protocol, authoritative server behavior, or shared-client capability is an
+  additive server change.
+- Preserve every existing consumer's room keys, message contracts, imports,
+  and deployment endpoint. Add a compatibility test when a change can affect
+  an existing contract.
+- For an additive server change, release server-first: run the server tests;
+  build, test, and release the shared client when it changed; deploy the
+  verified server to the existing Vercel deployment; then complete public
+  two-client verification for the changed capability and affected existing
+  contracts.
+
 ## Documentation and consumers
 
 - Use **Live Demos** in READMEs and link to the GitHub Pages sites of consuming
   repositories. This server has no standalone playable demo.
 - Keep the demo lists and `multiplayer-server/documentation/games.md` aligned
-  with supported consumers. Do not list unrelated games.
+  with supported game consumers. Do not list unrelated games. Non-game
+  applications can reuse documented rooms and the shared client without a game
+  registry entry unless they introduce a new server capability.
 - Whenever a new game updates this server, add or update its root README
   Live Demos bullet and supported game registry entry. Use one bullet per game
   in the format `[**Game Name**](GitHub Pages URL) — short description.` and
