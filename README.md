@@ -1,5 +1,14 @@
 ![Samuel Asher Rivello](multiplayer-server/documentation/samuel-asher-rivello-banner.png)
 
+[![Colyseus](https://img.shields.io/badge/Colyseus-0.17-7B2CBF)](https://colyseus.io/)
+[![Vercel deployment](https://img.shields.io/badge/Vercel-deployment-000000?logo=vercel&logoColor=white)](https://rmc-colyseus-multiplayer-server.vercel.app)
+[![GitHub Actions](https://img.shields.io/github/actions/workflow/status/SamuelAsherRivello/rmc-colyseus-multiplayer-server/pull-request.yml?label=GitHub%20Actions)](https://github.com/SamuelAsherRivello/rmc-colyseus-multiplayer-server/actions)
+[![Multiplayer Server](https://img.shields.io/badge/Multiplayer-server-0E7490)](https://github.com/SamuelAsherRivello/rmc-colyseus-multiplayer-server)
+[![Node.js](https://img.shields.io/badge/Node.js-24-5FA04E?logo=nodedotjs&logoColor=white)](https://nodejs.org/)
+[![OpenSpec](https://img.shields.io/badge/OpenSpec-maintained-6B46C1)](https://github.com/Fission-AI/OpenSpec)
+[![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![WebSocket](https://img.shields.io/badge/WebSocket-real--time-2563EB)](https://developer.mozilla.org/docs/Web/API/WebSockets_API)
+
 # RMC Colyseus Multiplayer Server
 
 Rivello Multimedia Consulting (RMC), led by [Samuel Asher Rivello](https://www.samuelasherrivello.com/) created this Colyseus relay server for multiplayer applications, including games. Consumer projects reuse the shared Vercel deployment when its rooms, protocol, and shared browser client fit.
