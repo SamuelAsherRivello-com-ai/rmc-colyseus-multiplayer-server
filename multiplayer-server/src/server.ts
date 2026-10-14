@@ -20,6 +20,7 @@ import { RingRivalsRoom } from "./ring-rivals-room.js";
 import { PrivateCodeRoom } from "./private-code-room.js";
 import { TetrisDuelRoom } from "./tetris-duel-room.js";
 import { JustLikeRabbitsAuthoritativeRoom } from "./just-like-rabbits-authoritative-room.js";
+import { CatHangoutRoom } from "./cat-hangout-room.js";
 
 import { SpaceInvadersRoom } from "./space-invaders-room.js";
 import { MusicRoom } from './music-room.js';
@@ -46,7 +47,7 @@ class GameWebSocketTransport extends WebSocketTransport {
     return super.onConnection(socket, request);
   }
 }
-type GameRoom = typeof AsteroidsRoom | typeof CombatRoom | typeof SpaceInvadersRoom | typeof MusicRoom | typeof BombermanRoom | typeof GungeonRoom | typeof DrawingRoom | typeof SumoRoom | typeof GardenRoom | typeof Gauntlet2DRoom | typeof GauntletRoom | typeof RacingRoom | typeof NeonBreakerRoom | typeof RingRivalsRoom | typeof StreetFighterRoom | typeof JustLikeRabbitsAuthoritativeRoom | typeof TetrisDuelRoom;
+type GameRoom = typeof AsteroidsRoom | typeof CombatRoom | typeof SpaceInvadersRoom | typeof MusicRoom | typeof BombermanRoom | typeof GungeonRoom | typeof DrawingRoom | typeof SumoRoom | typeof GardenRoom | typeof Gauntlet2DRoom | typeof GauntletRoom | typeof RacingRoom | typeof NeonBreakerRoom | typeof RingRivalsRoom | typeof StreetFighterRoom | typeof JustLikeRabbitsAuthoritativeRoom | typeof TetrisDuelRoom | typeof CatHangoutRoom;
 const games = new Map<string, GameRoom>([
   ["asteroids-coop", AsteroidsRoom], ["music-maker", MusicRoom], ["space-invaders", SpaceInvadersRoom], ["combat", CombatRoom], ["bomberman", BombermanRoom], ["gungeon", GungeonRoom], ["multiplayer-draw", DrawingRoom],
 
@@ -54,6 +55,7 @@ const games = new Map<string, GameRoom>([
   ["gauntlet-3d", GauntletRoom], ["dust-circuit-rally", RacingRoom],
   ["neon-breaker-duo", NeonBreakerRoom], ["ring-rivals", RingRivalsRoom],
   ["tetris-duel", TetrisDuelRoom], ["street-fighter-ii", StreetFighterRoom], ["just-like-rabbits", JustLikeRabbitsAuthoritativeRoom],
+  ["cat-hangout", CatHangoutRoom],
 ]);
 // A dedicated free deployment isolates Asteroids from legacy process-local rooms.
 if (process.env.ASTEROIDS_ONLY === '1') {
