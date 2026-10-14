@@ -10,6 +10,7 @@ function admissionError(value: unknown): AdmissionError { return value instanceo
 interface Snapshot<GameState, Transfer, PlayerType extends Player> {players: PlayerType[];strokes?: Stroke[];capacity: number;gameState?: GameState & Authority<Transfer>;chats?: Chat[];hostId?: string | null;seat?: number}
 import { Client, type Room } from "@colyseus/sdk";
 import {consumeReservedSeat} from "./seat-reservation.js";
+export * from "./just-like-rabbits.js";
 
 const ROOM_CODE_ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
 

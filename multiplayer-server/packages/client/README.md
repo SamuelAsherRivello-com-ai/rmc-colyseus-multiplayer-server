@@ -60,7 +60,7 @@ This package is part of **RMC Colyseus Multiplayer Server**, which has no standa
 - [**Garden Chat**](https://samuelasherrivello.github.io/babylon-lite-garden-chat/) — wander a shared garden and chat with other visitors.
 - [**Gauntlet Clone 2D**](https://samuelasherrivello.github.io/babylon-lite-gauntlet-clone-2d/) — cooperate to battle monsters, revive allies, and escape a tile-based dungeon.
 - [**Gauntlet Clone 3D**](https://samuelasherrivello.github.io/babylon-lite-gauntlet-clone-3d/) — team up to destroy summoning altars and escape a 3D dungeon.
-- **Just Like Rabbits** — shared rabbit observation habitat with participant-host migration. (In development.)
+- **Just Like Rabbits** — two-player server-authoritative rabbit habitat. (In development.)
 - [**Multiplayer Draw**](https://samuelasherrivello.github.io/babylon-lite-multiplayer-draw/) — a shared drawing canvas with hot join and departure cleanup.
 - [**Music Maker Multiplayer**](https://samuelasherrivello.github.io/babylon-lite-music-maker-multiplayer/) — four-player host-simulated music sandbox with next-step local and three-second remote sounds.
 - [**Neon Breaker Duo**](https://samuelasherrivello.github.io/babylon-lite-arkanoid-clone/) — co-operate to clear a neon brick field together. (In development.)
@@ -80,13 +80,13 @@ Create `new MultiplayerClient(endpoint, "sumo-battle")`. Subscribe to `state.gam
 
 Generic game state clears on connect, connection loss, and disconnect. Existing drawing messages and stroke state remain compatible.
 
-## Just Like Rabbits (next shared-client release)
+## Just Like Rabbits (0.9.14)
 
-Use `new MultiplayerClient(endpoint, "just-like-rabbits")`. Capacity is twelve. `state.players` exposes the server-assigned fictional `name`, `number`, `color`, `cursor`, and `host` flag. Cursors are normalized `[x,y]` coordinates in `[0,1]` or `null`; names belong in the roster, not beside cursors. `state.hostId` identifies the elected longest-connected active participant.
+Use `new MultiplayerClient<JustLikeRabbitsState, JustLikeRabbitsActions>(endpoint, "just-like-rabbits")`. Capacity is two. `state.players` exposes server-assigned fictional `name`, `number`, `color`, and `cursor` values. Cursors are normalized `[x,y]` coordinates in `[0,1]` or `null`; names belong in the roster, not beside cursors. The server sends the complete habitat as `state.gameState`.
 
-Any participant can send `action` with `{type:"cue",payload:[x,y]}`, `{type:"plant"|"water",payload:{x,z}}`, or `{type:"speed",payload:0.5|1|2|4|10}`. The relay orders valid requests as `habitatAction`; only the elected host resolves them. The host sends `{state,random,clock}` as `hostSnapshot`; guests receive `gameState` plus `hostTransfer` and must interpolate presentation rather than run authority. The client sends liveness heartbeats automatically. Local pause does not pause the shared habitat.
+Any participant can send `action` with `{type:"plant",payload:{x,z}}` or `{type:"speed",payload:0.5|1|2|4|10}`. The room validates each action, advances a seeded habitat in fixed 100 ms ticks, and broadcasts the resulting `gameState`. Clients render snapshots and never publish or resolve habitat rules. The client sends liveness heartbeats automatically. Local input pause does not pause the shared habitat.
 
-The room and identities are in-memory: a process replacement ends the session. Pin the exact client release after its compatible backend deployment and public two-client verification. Existing game consumers do not need changes for an additive game release unless a compatibility check identifies an actual contract change.
+The room and identities are in-memory: a process replacement ends the session. A full room reports `full`; an interrupted room reports connection loss and requires a fresh retry after expiry. Pin the exact client release after its compatible backend deployment and public two-client verification. Existing game consumers do not need changes for an additive game release unless a compatibility check identifies an actual contract change.
 ## Garden Chat
 Use game key `garden-chat`. Send `move` with `{x,z}` normalized axes (refresh within 300ms), or `chat` with a plain string up to 280 characters. State exposes `players` with x/z and `chats` with the latest 100 messages. Events: garden, chat, snapshot, presence, departed. Chat rate: one per 750ms. History is in-memory and resets when the room closes. Local pause must send zero movement.
 
