@@ -76,6 +76,7 @@ test("Just Like Rabbits shares server-owned state across twelve seats and reject
     const second = await join();
     assert.equal(first.state.roomId, second.state.roomId);
     assert.equal(first.state.capacity, 12);
+    await until(() => second.state.gameState?.rabbits.filter(rabbit => rabbit.kind === "bot").length === 3, "bot rabbits were not broadcast");
     first.send("action", { type: "plant", payload: { x: 2, z: 2 } });
     await until(() => second.state.gameState?.plots.some(plot => plot.x === 2 && plot.y === 2), "server did not broadcast planted plot");
     second.send("action", { type: "speed", payload: 10 });
@@ -89,6 +90,7 @@ test("Just Like Rabbits shares server-owned state across twelve seats and reject
     const additional = await Promise.all(Array.from({ length: 10 }, () => join()));
     await until(() => first.state.players.length === 12, "twelve players were not admitted");
     assert.ok(additional.every(client => client.state.status === "connected"));
+    await until(() => first.state.gameState?.rabbits.filter(rabbit => rabbit.kind === "bot").length === 1, "bot population did not contract at capacity");
     const thirteenth = await join();
     assert.equal(thirteenth.state.status, "full");
     first.disconnect();
