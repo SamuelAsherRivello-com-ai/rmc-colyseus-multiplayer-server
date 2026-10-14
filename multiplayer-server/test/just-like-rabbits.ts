@@ -62,6 +62,17 @@ test("authoritative habitat keeps resident rabbits and reconciles one to three d
   assert.notDeepEqual(state.rabbits, before);
 });
 
+test("a server-controlled bot targets and consumes an authoritative carrot object", () => {
+  const state = initialHabitatState();
+  reconcileBotRabbits(state, 1);
+  const bot = state.rabbits.find(rabbit => rabbit.kind === "bot")!;
+  bot.x = 4; bot.y = 5; bot.state = "seekCarrot"; bot.stateUntil = 0;
+  state.carrots = [{ x: 5, y: 5 }];
+  advance(state, 2);
+  assert.equal(state.carrots.length, 0);
+  assert.notEqual(bot.state, "seekCarrot");
+});
+
 test("Just Like Rabbits shares server-owned state across twelve seats and rejects a thirteenth", { timeout: 90000 }, async () => {
   let server: ReturnType<typeof spawn> | undefined;
   try {
