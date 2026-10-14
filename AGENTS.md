@@ -47,6 +47,18 @@
 - Live integration checks require an otherwise empty drawing session.
 - Do not deploy, publish a release, or create a pull request unless requested.
 
+## OpenSpec records and planning
+
+- Use the installed global OpenSpec skills for planning work in this order:
+  Explore, Propose, optional Update, then Apply.
+- Do not install or generate repository-local OpenSpec skills. If the required
+  global skill is unavailable, stop and ask the user before choosing another
+  process.
+- `openspec/` preserves earlier proposals, designs, tasks, and specifications.
+  It is maintenance history, not a game-creation dependency or an automatic
+  workflow trigger. Read a record only when it is relevant to the requested
+  work.
+
 ## Strict TypeScript ownership
 
 - Author application, browser client/rules, tests, probes, configuration and workflow tools in `.ts`/`.tsx`. Keep emitted `.js`/`.d.ts` in ignored `dist/` trees; never hand-maintain declaration companions.

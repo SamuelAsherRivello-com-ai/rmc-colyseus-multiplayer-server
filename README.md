@@ -89,7 +89,7 @@ Run commands from the repository root. The checked-in release workflow targets V
 
 ### 📦 AI
 
-[AGENTS.md](AGENTS.md) documents the layout, verification commands, and consumer-link conventions. The README and layout follow the supplied Multiplayer Draw reference, adapted for a shared backend.
+[AGENTS.md](AGENTS.md) documents the layout, verification commands, planning policy, and consumer-link conventions. Use the installed global OpenSpec skills for planning when they apply. The checked-in [OpenSpec records](openspec/README.md) are maintenance history and do not start a local workflow.
 
 ### 📦 Packages
 
@@ -134,7 +134,7 @@ HTTP: `GET /api/health`; `POST /api/join/multiplayer-draw` returns a Colyseus se
 
 ### Hosting Limits
 
-The checked-in server keeps its room index, matchmaking, and recovery state in process memory. Those states are not shared across Vercel function instances or restored after process loss. A room link can rejoin a room while that same process still owns it; a fresh process requires a new room. The separate `standardize-private-room-flow` OpenSpec change owns the cross-instance continuity and release gate. The historical Render Blueprint and [recorded hosting evidence](multiplayer-server/documentation/feasibility.md) describe a prior hosting direction, not a completed migration.
+The checked-in server keeps its room index, matchmaking, and recovery state in process memory. Those states are not shared across Vercel function instances or restored after process loss. A room link can rejoin a room while that same process still owns it; a fresh process requires a new room. The `standardize-private-room-flow` record documents pending cross-instance continuity and release criteria. It does not start a local workflow. The historical Render Blueprint and [recorded hosting evidence](multiplayer-server/documentation/feasibility.md) describe a prior hosting direction, not a completed migration.
 
 ### Additive release policy
 
