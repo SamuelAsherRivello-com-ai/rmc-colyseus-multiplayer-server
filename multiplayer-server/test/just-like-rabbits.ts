@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import { spawn } from "node:child_process";
 import { setTimeout as delay } from "node:timers/promises";
 import { MultiplayerClient } from "../packages/client/index.js";
-import { advance, initialHabitatState, plant, setTimeScale, type HabitatState } from "../src/just-like-rabbits-simulation.ts";
+import { advance, botCountForHumans, initialHabitatState, plant, reconcileBotRabbits, setTimeScale, type HabitatState } from "../src/just-like-rabbits-simulation.ts";
 
 type Actions = { action: { type: "plant"; payload: { x: number; z: number } } | { type: "speed"; payload: 0.5 | 1 | 2 | 4 | 10 } };
 const endpoint = process.env.SERVER_URL || "http://127.0.0.1:2694";
@@ -35,7 +35,34 @@ test("authoritative habitat advances deterministic state in fixed ticks", () => 
   assert.equal(state.elapsed, 0.3);
 });
 
-test("Just Like Rabbits shares server-owned state and rejects a third client", { timeout: 90000 }, async () => {
+test("cultivated dirt carries a carrot through four frames to a harvest object", () => {
+  const state = initialHabitatState();
+  assert.equal(plant(state, { x: 2, y: 2 }), true);
+  assert.deepEqual(state.cultivated, [{ x: 2, y: 2 }]);
+  for (const [seconds, stage] of [[14.9, 0], [0.1, 1], [15, 2], [15, 3]] as const) { advance(state, seconds); assert.equal(state.plots[0]?.stage, stage); }
+  advance(state, 15);
+  assert.equal(state.plots.length, 0);
+  assert.deepEqual(state.carrots, [{ x: 2, y: 2 }]);
+  assert.equal(plant(state, { x: 2, y: 2 }), false);
+  state.carrots = [];
+  assert.equal(plant(state, { x: 2, y: 2 }), true);
+});
+
+test("authoritative habitat keeps resident rabbits and reconciles one to three deterministic bots", () => {
+  const state = initialHabitatState();
+  for (const [humans, expected] of [[1, 3], [4, 3], [5, 2], [8, 2], [9, 1], [12, 1]] as const) {
+    reconcileBotRabbits(state, humans);
+    assert.equal(botCountForHumans(humans), expected);
+    assert.equal(state.rabbits.filter(rabbit => rabbit.kind === "resident").map(rabbit => rabbit.id).join(","), "hazel,poppy");
+    assert.equal(state.rabbits.filter(rabbit => rabbit.kind === "bot").length, expected);
+  }
+  const before = structuredClone(state.rabbits);
+  advance(state, 1);
+  assert.equal(state.rabbits.filter(rabbit => rabbit.kind === "bot").length, 1);
+  assert.notDeepEqual(state.rabbits, before);
+});
+
+test("Just Like Rabbits shares server-owned state across twelve seats and rejects a thirteenth", { timeout: 90000 }, async () => {
   let server: ReturnType<typeof spawn> | undefined;
   try {
     if (!process.env.SERVER_URL) {
@@ -48,7 +75,7 @@ test("Just Like Rabbits shares server-owned state and rejects a third client", {
     const first = await join();
     const second = await join();
     assert.equal(first.state.roomId, second.state.roomId);
-    assert.equal(first.state.capacity, 2);
+    assert.equal(first.state.capacity, 12);
     first.send("action", { type: "plant", payload: { x: 2, z: 2 } });
     await until(() => second.state.gameState?.plots.some(plot => plot.x === 2 && plot.y === 2), "server did not broadcast planted plot");
     second.send("action", { type: "speed", payload: 10 });
@@ -59,10 +86,13 @@ test("Just Like Rabbits shares server-owned state and rejects a third client", {
     second.send("action", { type: "plant", payload: { x: 99, z: 0 } });
     await delay(150);
     assert.equal(first.state.gameState?.plots.length, 1, "invalid plot was accepted");
-    const third = await join();
-    assert.equal(third.state.status, "full");
+    const additional = await Promise.all(Array.from({ length: 10 }, () => join()));
+    await until(() => first.state.players.length === 12, "twelve players were not admitted");
+    assert.ok(additional.every(client => client.state.status === "connected"));
+    const thirteenth = await join();
+    assert.equal(thirteenth.state.status, "full");
     first.disconnect();
-    await until(() => second.state.players.length === 1, "departure was not broadcast");
+    await until(() => second.state.players.length === 11, "departure was not broadcast");
     const replacement = await join();
     assert.equal(replacement.state.status, "connected", "a released seat was not reusable");
   } finally {

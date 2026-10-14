@@ -11,7 +11,7 @@
 | Garden Chat | garden-chat | 12 | 0.3.0+ | [Live demo](https://samuelasherrivello.github.io/babylon-lite-garden-chat/) | — |
 | Gauntlet Clone 2D | gauntlet-2d | 4 | 0.4.0+ | [Live demo](https://samuelasherrivello.github.io/babylon-lite-gauntlet-clone-2d/) | — |
 | Gauntlet Clone 3D | gauntlet-3d | 4 | 0.5.0+ | [Live demo](https://samuelasherrivello.github.io/babylon-lite-gauntlet-clone-3d/) | — |
-| Just Like Rabbits | just-like-rabbits | 2 | 0.9.14 | In development | Server-authoritative fixed-step habitat; public demo follows GitHub Pages verification. |
+| Just Like Rabbits | just-like-rabbits | 12 | 0.9.15 | [Live demo](https://samuelasherrivello-com-ai.github.io/just-like-rabbits/) | Server-authoritative fixed-step habitat with capacity-adaptive bot rabbits and one-minute carrots. |
 | Multiplayer Draw | multiplayer-draw | 12 | 0.1.0+ | [Live demo](https://samuelasherrivello.github.io/babylon-lite-multiplayer-draw/) | — |
 | Music Maker Multiplayer | music-maker | 4 | 0.9.13 | [Live demo](https://samuelasherrivello.github.io/babylon-lite-music-maker-multiplayer/) | Four-character private rooms; host loss ends session |
 | Neon Breaker Duo | neon-breaker-duo | 2 | 0.9.3+ | [Live playtest](https://samuelasherrivello.github.io/babylon-lite-arkanoid-clone/) | — |
@@ -29,7 +29,7 @@ All packages are @rmc/multiplayer-client. Before changing a shared protocol, rev
 
 ## Just Like Rabbits
 
-`just-like-rabbits` is a two-seat server-authoritative habitat. The room owns seeded fixed-step carrot growth, rabbit behavior, and time scale. Participants send validated planting or speed intent and render complete snapshots. A third admission receives a full-room result. Departure frees a seat; a deployment or expiry ends the in-memory habitat and requires a fresh retry. The consumer pins the 0.9.14 shared-client package after a public two-client verification. Existing games retain their documented protocols unless a regression test proves otherwise.
+`just-like-rabbits` is a twelve-seat server-authoritative habitat. The room owns seeded fixed-step one-minute carrot growth, rabbit behavior, and time scale. It maintains Hazel and Poppy plus one to three deterministic bot rabbits that do not consume human seats. Participants send validated planting or speed intent and render complete snapshots. A thirteenth admission receives a full-room result. Departure frees a seat; a deployment or expiry ends the in-memory habitat and requires a fresh retry. The consumer pins the 0.9.15 shared-client package after a public capacity verification. Existing games retain their documented protocols unless a regression test proves otherwise.
 
 ## Enter the Gungeon Clone
 

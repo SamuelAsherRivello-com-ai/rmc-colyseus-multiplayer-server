@@ -61,7 +61,7 @@ This package is part of **RMC Colyseus Multiplayer Server**, which has no standa
 - [**Garden Chat**](https://samuelasherrivello.github.io/babylon-lite-garden-chat/) — wander a shared garden and chat with other visitors.
 - [**Gauntlet Clone 2D**](https://samuelasherrivello.github.io/babylon-lite-gauntlet-clone-2d/) — cooperate to battle monsters, revive allies, and escape a tile-based dungeon.
 - [**Gauntlet Clone 3D**](https://samuelasherrivello.github.io/babylon-lite-gauntlet-clone-3d/) — team up to destroy summoning altars and escape a 3D dungeon.
-- **Just Like Rabbits** — two-player server-authoritative rabbit habitat. (In development.)
+- [**Just Like Rabbits**](https://samuelasherrivello-com-ai.github.io/just-like-rabbits/) — twelve-person server-authoritative rabbit habitat with capacity-adaptive bot rabbits.
 - [**Multiplayer Draw**](https://samuelasherrivello.github.io/babylon-lite-multiplayer-draw/) — a shared drawing canvas with hot join and departure cleanup.
 - [**Music Maker Multiplayer**](https://samuelasherrivello.github.io/babylon-lite-music-maker-multiplayer/) — four-player host-simulated music sandbox with next-step local and three-second remote sounds.
 - [**Neon Breaker Duo**](https://samuelasherrivello.github.io/babylon-lite-arkanoid-clone/) — co-operate to clear a neon brick field together. (In development.)
@@ -81,9 +81,9 @@ Create `new MultiplayerClient(endpoint, "sumo-battle")`. Subscribe to `state.gam
 
 Generic game state clears on connect, connection loss, and disconnect. Existing drawing messages and stroke state remain compatible.
 
-## Just Like Rabbits (0.9.14)
+## Just Like Rabbits (0.9.15)
 
-Use `new MultiplayerClient<JustLikeRabbitsState, JustLikeRabbitsActions>(endpoint, "just-like-rabbits")`. Capacity is two. `state.players` exposes server-assigned fictional `name`, `number`, `color`, and `cursor` values. Cursors are normalized `[x,y]` coordinates in `[0,1]` or `null`; names belong in the roster, not beside cursors. The server sends the complete habitat as `state.gameState`.
+Use `new MultiplayerClient<JustLikeRabbitsState, JustLikeRabbitsActions>(endpoint, "just-like-rabbits")`. Capacity is twelve humans. `state.players` exposes server-assigned fictional `name`, `number`, `color`, and `cursor` values; `state.gameState.rabbits` contains Hazel, Poppy, and one to three server-controlled bot rabbits. Cursors are normalized `[x,y]` coordinates in `[0,1]` or `null`; names belong in the roster, not beside cursors. The server sends the complete habitat as `state.gameState`.
 
 Any participant can send `action` with `{type:"plant",payload:{x,z}}` or `{type:"speed",payload:0.5|1|2|4|10}`. The room validates each action, advances a seeded habitat in fixed 100 ms ticks, and broadcasts the resulting `gameState`. Clients render snapshots and never publish or resolve habitat rules. The client sends liveness heartbeats automatically. Local input pause does not pause the shared habitat.
 
