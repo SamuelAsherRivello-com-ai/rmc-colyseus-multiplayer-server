@@ -4,6 +4,7 @@
 |---|---|---|---|---|---|
 | Asteroids Multiplayer Clone | asteroids-coop | 4 | 0.9.12+ | [Live demo](https://samuelasherrivello.github.io/babylon-lite-asteroids-multiplayer-clone/) | [Rules/API](asteroids.md) · fixed host, session-scoped private guest recovery |
 | Bomberman Clone | bomberman | 4 | 0.9.2+ | [Multiplayer preview](https://samuelasherrivello.github.io/babylon-lite-bomberman-clone/?mode=online) | Optional growing plants block movement without damage. [Guide](../packages/client/README.md#coded-private-room-workflow) · [Admission](../src/server.ts#L39) · [Lifecycle](../src/private-code-room.ts#L14) |
+| Cat Hangout | cat-hangout | 12 humans; bots fill to 4 cats | next release | In development | Public automatic room; server validates movement and interaction. |
 | Combat Clone | combat | 4 humans / 4 tanks | next release | In development | [Protocol](combat.md) · [Room](../src/combat-room.ts) |
 | Dust Circuit Rally | dust-circuit-rally | 4 | 0.6.0+ | [Live demo](https://samuelasherrivello.github.io/babylon-lite-super-offroad-clone/) | — |
 | Enter the Gungeon Clone | gungeon | 4 | 0.9.7+ | [Live demo](https://samuelasherrivello.github.io/babylon-lite-enter-the-gungeon-clone/) | [Guide](../packages/client/README.md#coded-private-room-workflow) · [Admission](../src/server.ts#L39) · [Lifecycle](../src/private-code-room.ts#L14) |
@@ -21,6 +22,10 @@
 | Tetris Multiplayer Clone | tetris-duel | 2 | 0.9.12 | [Play](https://samuelasherrivello.github.io/babylon-lite-tetris-multiplayer-clone/) | Four-character private rooms; authenticated 15-second cumulative recovery; [Rules/API](tetris-duel.md) |
 
 All packages are @rmc/multiplayer-client. Before changing a shared protocol, review each game, update affected consumers and test public URLs. Short downtime and session loss are acceptable; leaving existing demos broken is not.
+
+## Cat Hangout
+
+`cat-hangout` is one automatic public social room for up to twelve human visitors. When fewer than four humans are present, the server adds enough labelled bot cats to reach four total cats, up to three bots. The room owns movement bounds, input validation, interaction state, generated roster identities, and bot activity. It intentionally has no combat, score, win, or loss state. Rooms are process-local: a server replacement ends the session and visitors reconnect into a fresh room.
 
 ## Just Like Rabbits
 

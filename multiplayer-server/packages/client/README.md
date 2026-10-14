@@ -54,6 +54,7 @@ This package is part of **RMC Colyseus Multiplayer Server**, which has no standa
 
 - [**Asteroids Multiplayer Clone**](https://samuelasherrivello.github.io/babylon-lite-asteroids-multiplayer-clone/) — fixed-host 1–4-player cooperative asteroid waves, three personal lives, hot joining and spectators.
 - [**Bomberman Clone**](https://samuelasherrivello.github.io/babylon-lite-bomberman-clone/) — private competitive bomb arena with optional growing plants that block movement.
+- **Cat Hangout** — public 1–12-player social cat room with friendly bot fill to four cats. (In development.)
 - **Combat Clone** — four-tank free-for-all with 1–4 humans, fair CPU fill and Classic/Ricochet shots. (In development.)
 - [**Dust Circuit Rally**](https://samuelasherrivello.github.io/babylon-lite-super-offroad-clone/) — race four off-road trucks in a fixed-camera landscape circuit with solo, local and online modes.
 - [**Enter the Gungeon Clone**](https://samuelasherrivello.github.io/babylon-lite-enter-the-gungeon-clone/) — survive bullet waves together in private 1–4-player rooms with dodge rolls, upgrades and revives.
