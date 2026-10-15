@@ -112,14 +112,21 @@ export async function connectSharedAsteroids(base: string, admission: AsteroidsA
     host: data.host,
     input: (value: AsteroidsInput) => send("input", value),
     publish: (value: AsteroidsFrame) => send("hostSnapshot", value),
-    leave: () => {
-      intentional = true;
-      clearTimeout(renewalTimer);
-      send("leave");
-      if (socket?.readyState === WebSocket.OPEN)
-        socket.send(JSON.stringify({ type: "leave" }));
-      setTimeout(() => socket?.close(1000, "Left room"), 100);
-    },
+    leave: () =>
+      new Promise<void>((resolve) => {
+        intentional = true;
+        clearTimeout(renewalTimer);
+        send("leave");
+        if (socket?.readyState === WebSocket.OPEN)
+          socket.send(JSON.stringify({ type: "leave" }));
+        if (!socket || socket.readyState === WebSocket.CLOSED) {
+          resolve();
+          return;
+        }
+        const close = () => resolve();
+        socket.addEventListener("close", close, { once: true });
+        setTimeout(() => socket?.close(1000, "Left room"), 100);
+      }),
     renew,
   };
 }

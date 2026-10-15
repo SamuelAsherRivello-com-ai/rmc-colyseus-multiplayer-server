@@ -157,7 +157,7 @@ export async function verifyAsteroidsSession(endpoint: string, seconds = 8) {
       "Four-player capacity did not synchronize",
     );
     await admission({ code: hostData.code }, 409);
-    for (const extra of extras) extra.leave();
+    await Promise.all(extras.map((extra) => extra.leave()));
     await until(
       () => world.players.filter((p) => p.connected).length === 2,
       "Guest drops did not release extra seats",
